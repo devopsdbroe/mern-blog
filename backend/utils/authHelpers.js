@@ -2,7 +2,9 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 
+// Data to be received by the frontend
 export const formatDataToSend = (user) => {
+	// Hash the user id from MongoDB, using JWT
 	const accessToken = jwt.sign({ id: user._id }, process.env.JWT_KEY);
 
 	return {
@@ -13,6 +15,7 @@ export const formatDataToSend = (user) => {
 	};
 };
 
+// Function to deal with dulicate usernames
 export const generateUsername = async (email) => {
 	let username = email.split("@")[0];
 
