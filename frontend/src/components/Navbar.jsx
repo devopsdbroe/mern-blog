@@ -1,24 +1,35 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import logo from "../images/logo.png";
+import { UserContext } from "../App";
+import UserNavigation from "./UserNavigation";
 
 const Navbar = () => {
 	const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
+	const [showUserNavigation, setShowUserNavigation] = useState(false);
+
+	const {
+		userAuth,
+		userAuth: { access_token, profile_img },
+	} = useContext(UserContext);
+
+	const handleShowUserNavigation = () => {
+		setShowUserNavigation((currentVal) => !currentVal);
+	};
+
+	const handleBlurFunction = () => {
+		setTimeout(() => {
+			setShowUserNavigation(false);
+		}, 200);
+	};
 
 	return (
 		<>
 			<nav className="navbar">
 				{/* Logo */}
-				<Link
-					to="/"
-					className="flex-none w-10"
-				>
+				<Link to="/" className="flex-none w-10">
 					{/* TODO: Find new logo */}
-					<img
-						src={logo}
-						alt="logo"
-						className="w-full"
-					/>
+					<img src={logo} alt="logo" className="w-full" />
 				</Link>
 
 				{/* Search bar */}
@@ -45,27 +56,47 @@ const Navbar = () => {
 						<i className="fi fi-rr-search text-xl"></i>
 					</button>
 
-					<Link
-						to="/editor"
-						className="hidden md:flex gap-2 link"
-					>
+					<Link to="/editor" className="hidden md:flex gap-2 link">
 						<i className="fi fi-rr-file-edit"></i>
 						<p>Write</p>
 					</Link>
 
-					<Link
-						className="btn-dark py-2"
-						to="/signin"
-					>
-						Sign In
-					</Link>
+					{access_token ? (
+						<>
+							{/* TODO: Create notification page */}
+							<Link to="/dashboard/notification">
+								<button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10 text-2xl block mt-1">
+									<i className="fi fi-rr-bell"></i>
+								</button>
+							</Link>
 
-					<Link
-						className="btn-light py-2 hidden md:block"
-						to="/signup"
-					>
-						Sign Up
-					</Link>
+							<div
+								className="relative"
+								onClick={handleShowUserNavigation}
+								onBlur={handleBlurFunction}
+							>
+								<button className="w-12 h-12 mt-1">
+									<img
+										src={profile_img}
+										alt="profile"
+										className="w-full h-full object-cover rounded-full"
+									/>
+								</button>
+
+								{showUserNavigation && <UserNavigation />}
+							</div>
+						</>
+					) : (
+						<>
+							<Link className="btn-dark py-2" to="/signin">
+								Sign In
+							</Link>
+
+							<Link className="btn-light py-2 hidden md:block" to="/signup">
+								Sign Up
+							</Link>
+						</>
+					)}
 				</div>
 			</nav>
 
