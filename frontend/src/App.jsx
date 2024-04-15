@@ -13,28 +13,20 @@ function App() {
 	useEffect(() => {
 		let userInSession = lookInSession("user");
 
-		userInSession ? setUserAuth(JSON.parse(userInSession)) : setUserAuth({ accessToken: null })
-	}, [])
+		userInSession
+			? setUserAuth(JSON.parse(userInSession))
+			: setUserAuth({ access_token: null });
+	}, []);
 
 	return (
-		<UserContext.Provider value={{userAuth, setUserAuth}}>
+		<UserContext.Provider value={{ userAuth, setUserAuth }}>
 			<Routes>
-				<Route
-					path="/"
-					element={<Navbar />}
-				>
-					<Route
-						path="signin"
-						element={<UserAuth type="sign-in" />}
-					/>
-					<Route
-						path="signup"
-						element={<UserAuth type="sign-up" />}
-					/>
+				<Route path="/" element={<Navbar />}>
+					<Route path="signin" element={<UserAuth type="sign-in" />} />
+					<Route path="signup" element={<UserAuth type="sign-up" />} />
 				</Route>
 			</Routes>
 		</UserContext.Provider>
-		
 	);
 }
 

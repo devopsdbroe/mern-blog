@@ -10,7 +10,7 @@ import { UserContext } from "../App";
 
 const UserAuth = ({ type }) => {
 	let {
-		userAuth: { accessToken },
+		userAuth: { access_token },
 		setUserAuth,
 	} = useContext(UserContext);
 
@@ -84,7 +84,7 @@ const UserAuth = ({ type }) => {
 		userAuthThroughServer(serverRoute, formData);
 	};
 
-	return accessToken ? (
+	return access_token ? (
 		<Navigate to="/" />
 	) : (
 		// Animation wrapper for fade-in effect

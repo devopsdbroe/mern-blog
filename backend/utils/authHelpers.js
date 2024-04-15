@@ -5,11 +5,11 @@ import { nanoid } from "nanoid";
 // Data to be received by the frontend
 export const formatDataToSend = (user) => {
 	// Hash the user id from MongoDB, using JWT
-	const accessToken = jwt.sign({ id: user._id }, process.env.JWT_KEY);
+	const access_token = jwt.sign({ id: user._id }, process.env.JWT_KEY);
 
 	return {
-		accessToken,
-		profileImg: user.personal_info.profileImg,
+		access_token,
+		profile_img: user.personal_info.profile_img,
 		username: user.personal_info.username,
 		fullname: user.personal_info.fullname,
 	};
