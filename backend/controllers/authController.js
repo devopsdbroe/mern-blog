@@ -35,7 +35,7 @@ export const signin = async (req, res) => {
 
 		const isMatch = await bcrypt.compare(password, user.personal_info.password);
 		if (!isMatch) {
-			return res.status(403).json({ error: "Password is incorrect" });
+			return res.status(403).json({ error: "Incorrect password" });
 		} else {
 			res.status(200).json(formatDataToSend(user));
 		}

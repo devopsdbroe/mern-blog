@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import UserAuthForm from "./pages/UserAuthForm";
+import UserAuth from "./pages/UserAuth";
 
 function App() {
 	return (
@@ -11,11 +11,11 @@ function App() {
 			>
 				<Route
 					path="signin"
-					element={<UserAuthForm type="sign-in" />}
+					element={<UserAuth type="sign-in" />}
 				/>
 				<Route
 					path="signup"
-					element={<UserAuthForm type="sign-up" />}
+					element={<UserAuth type="sign-up" />}
 				/>
 			</Route>
 		</Routes>
