@@ -1,11 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import AnimationWrapper from "../common/AnimationWrapper";
 import InputBox from "../components/InputBox";
 import googleIcon from "../images/google.png";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
+import { storeInSession } from "../common/Session";
+import { useContext } from "react";
+import { UserContext } from "../App";
 
 const UserAuth = ({ type }) => {
+	let {
+		userAuth: { accessToken },
+		setUserAuth,
+	} = useContext(UserContext);
+
 	const userAuthThroughServer = async (serverRoute, formData) => {
 		try {
 			// Define where we want to send our form data using Axios
@@ -21,9 +29,11 @@ const UserAuth = ({ type }) => {
 
 			// Check if the server responded with a non-200 status code
 			if (res.status !== 200) {
-				// Assuming the server sends back an error in the response body
+				// Show toast of error returned by Axios
 				toast.error(res.data.error);
 			} else {
+				storeInSession("user", JSON.stringify(res.data));
+				setUserAuth(res.data);
 				toast.success("Login successful!");
 			}
 		} catch (error) {
@@ -74,16 +84,15 @@ const UserAuth = ({ type }) => {
 		userAuthThroughServer(serverRoute, formData);
 	};
 
-	return (
+	return accessToken ? (
+		<Navigate to="/" />
+	) : (
 		// Animation wrapper for fade-in effect
 		// keyValue prop enables fade-in for sign-in and sign-up pages
 		<AnimationWrapper keyValue={type}>
 			<section className="h-cover flex items-center justify-center">
 				<Toaster />
-				<form
-					id="formElement"
-					className="w-[80%] max-w-[400px]"
-				>
+				<form id="formElement" className="w-[80%] max-w-[400px]">
 					<h1 className="text-4xl font-gelasio capitalize text-center mb-24">
 						{type === "sign-in" ? "Welcome back!" : "Join us today!"}
 					</h1>
@@ -128,11 +137,7 @@ const UserAuth = ({ type }) => {
 					</div>
 
 					<button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
-						<img
-							src={googleIcon}
-							alt="google icon"
-							className="w-5"
-						/>
+						<img src={googleIcon} alt="google icon" className="w-5" />
 						continue with google
 					</button>
 
