@@ -7,6 +7,7 @@ import axios from "axios";
 import { storeInSession } from "../common/Session";
 import { useContext } from "react";
 import { UserContext } from "../App";
+import { authWithGoogle } from "../firebase";
 
 const UserAuth = ({ type }) => {
 	let {
@@ -84,6 +85,25 @@ const UserAuth = ({ type }) => {
 		userAuthThroughServer(serverRoute, formData);
 	};
 
+	const handleGoogleAuth = (e) => {
+		e.preventDefault();
+
+		authWithGoogle()
+			.then((user) => {
+				let serverRoute = "/auth/google";
+
+				let formData = {
+					access_token: user.accessToken,
+				};
+
+				userAuthThroughServer(serverRoute, formData);
+			})
+			.catch((err) => {
+				toast.error("Error logging in with Google");
+				console.log(err);
+			});
+	};
+
 	return access_token ? (
 		<Navigate to="/" />
 	) : (
@@ -92,7 +112,10 @@ const UserAuth = ({ type }) => {
 		<AnimationWrapper keyValue={type}>
 			<section className="h-cover flex items-center justify-center">
 				<Toaster />
-				<form id="formElement" className="w-[80%] max-w-[400px]">
+				<form
+					id="formElement"
+					className="w-[80%] max-w-[400px]"
+				>
 					<h1 className="text-4xl font-gelasio capitalize text-center mb-24">
 						{type === "sign-in" ? "Welcome back!" : "Join us today!"}
 					</h1>
@@ -136,8 +159,15 @@ const UserAuth = ({ type }) => {
 						<hr className="w-1/2 border-black" />
 					</div>
 
-					<button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
-						<img src={googleIcon} alt="google icon" className="w-5" />
+					<button
+						className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+						onClick={handleGoogleAuth}
+					>
+						<img
+							src={googleIcon}
+							alt="google icon"
+							className="w-5"
+						/>
 						continue with google
 					</button>
 
