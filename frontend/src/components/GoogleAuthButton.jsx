@@ -1,7 +1,7 @@
-import { authWithGoogle } from "../auth/firebase";
+import { authWithGoogle } from "../services/firebase";
 import useAuth from "../hooks/useAuth";
 import toast from "react-hot-toast";
-import googleIcon from "../images/google.png";
+import googleIcon from "../assets/google.png";
 
 const GoogleAuthButton = ({ serverRoute }) => {
 	const { userAuthThroughServer } = useAuth();

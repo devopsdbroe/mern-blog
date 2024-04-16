@@ -1,9 +1,9 @@
 import { Link, Navigate } from "react-router-dom";
-import AnimationWrapper from "../common/AnimationWrapper";
+import AnimationWrapper from "../components/AnimationWrapper";
 import InputBox from "../components/InputBox";
 import { Toaster, toast } from "react-hot-toast";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../context/UserProvider";
 import useAuth from "../hooks/useAuth";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 
@@ -12,34 +12,6 @@ const UserAuth = ({ type }) => {
 	const {
 		userAuth: { access_token },
 	} = useContext(UserContext);
-
-	// const userAuthThroughServer = async (serverRoute, formData) => {
-	// 	try {
-	// 		// Define where we want to send our form data using Axios
-	// 		const res = await axios.post(
-	// 			import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
-	// 			formData,
-	// 			{
-	// 				validateStatus: function (status) {
-	// 					return status >= 200 && status < 500; // Resolve only if the status code is less than 500
-	// 				},
-	// 			}
-	// 		);
-
-	// 		// Check if the server responded with a non-200 status code
-	// 		if (res.status !== 200) {
-	// 			// Show toast of error returned by Axios
-	// 			toast.error(res.data.error);
-	// 		} else {
-	// 			storeInSession("user", JSON.stringify(res.data));
-	// 			setUserAuth(res.data);
-	// 			toast.success("Login successful!");
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("Request failed:", error);
-	// 		toast.error("A network error occurred");
-	// 	}
-	// };
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -82,25 +54,6 @@ const UserAuth = ({ type }) => {
 
 		userAuthThroughServer(serverRoute, formData);
 	};
-
-	// const handleGoogleAuth = (e) => {
-	// 	e.preventDefault();
-
-	// 	authWithGoogle()
-	// 		.then((user) => {
-	// 			let serverRoute = "/auth/google";
-
-	// 			let formData = {
-	// 				access_token: user.accessToken,
-	// 			};
-
-	// 			userAuthThroughServer(serverRoute, formData);
-	// 		})
-	// 		.catch((err) => {
-	// 			toast.error("Error logging in with Google");
-	// 			console.log(err);
-	// 		});
-	// };
 
 	return access_token ? (
 		<Navigate to="/" />

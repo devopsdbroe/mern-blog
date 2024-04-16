@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import logo from "../images/logo.png";
-import { UserContext } from "../App";
+import logo from "../assets/logo.png";
+import { UserContext } from "../context/UserProvider";
 import UserNavigation from "./UserNavigation";
 
 const Navbar = () => {
@@ -27,9 +27,16 @@ const Navbar = () => {
 		<>
 			<nav className="navbar">
 				{/* Logo */}
-				<Link to="/" className="flex-none w-10">
+				<Link
+					to="/"
+					className="flex-none w-10"
+				>
 					{/* TODO: Find new logo */}
-					<img src={logo} alt="logo" className="w-full" />
+					<img
+						src={logo}
+						alt="logo"
+						className="w-full"
+					/>
 				</Link>
 
 				{/* Search bar */}
@@ -56,7 +63,10 @@ const Navbar = () => {
 						<i className="fi fi-rr-search text-xl"></i>
 					</button>
 
-					<Link to="/editor" className="hidden md:flex gap-2 link">
+					<Link
+						to="/editor"
+						className="hidden md:flex gap-2 link"
+					>
 						<i className="fi fi-rr-file-edit"></i>
 						<p>Write</p>
 					</Link>
@@ -88,11 +98,17 @@ const Navbar = () => {
 						</>
 					) : (
 						<>
-							<Link className="btn-dark py-2" to="/signin">
+							<Link
+								className="btn-dark py-2"
+								to="/signin"
+							>
 								Sign In
 							</Link>
 
-							<Link className="btn-light py-2 hidden md:block" to="/signup">
+							<Link
+								className="btn-light py-2 hidden md:block"
+								to="/signup"
+							>
 								Sign Up
 							</Link>
 						</>

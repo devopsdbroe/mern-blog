@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../App";
+import { UserContext } from "../context/UserProvider";
 import toast from "react-hot-toast";
-import { storeInSession } from "../common/Session";
+import { storeInSession } from "../services/session";
 
 const useAuth = () => {
 	const { setUserAuth } = useContext(UserContext);
