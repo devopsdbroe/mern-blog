@@ -1,47 +1,45 @@
 import { Link, Navigate } from "react-router-dom";
 import AnimationWrapper from "../common/AnimationWrapper";
 import InputBox from "../components/InputBox";
-import googleIcon from "../images/google.png";
 import { Toaster, toast } from "react-hot-toast";
-import axios from "axios";
-import { storeInSession } from "../common/Session";
 import { useContext } from "react";
 import { UserContext } from "../App";
-import { authWithGoogle } from "../firebase";
+import useAuth from "../hooks/useAuth";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 
 const UserAuth = ({ type }) => {
-	let {
+	const { userAuthThroughServer } = useAuth();
+	const {
 		userAuth: { access_token },
-		setUserAuth,
 	} = useContext(UserContext);
 
-	const userAuthThroughServer = async (serverRoute, formData) => {
-		try {
-			// Define where we want to send our form data using Axios
-			const res = await axios.post(
-				import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
-				formData,
-				{
-					validateStatus: function (status) {
-						return status >= 200 && status < 500; // Resolve only if the status code is less than 500
-					},
-				}
-			);
+	// const userAuthThroughServer = async (serverRoute, formData) => {
+	// 	try {
+	// 		// Define where we want to send our form data using Axios
+	// 		const res = await axios.post(
+	// 			import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
+	// 			formData,
+	// 			{
+	// 				validateStatus: function (status) {
+	// 					return status >= 200 && status < 500; // Resolve only if the status code is less than 500
+	// 				},
+	// 			}
+	// 		);
 
-			// Check if the server responded with a non-200 status code
-			if (res.status !== 200) {
-				// Show toast of error returned by Axios
-				toast.error(res.data.error);
-			} else {
-				storeInSession("user", JSON.stringify(res.data));
-				setUserAuth(res.data);
-				toast.success("Login successful!");
-			}
-		} catch (error) {
-			console.error("Request failed:", error);
-			toast.error("A network error occurred");
-		}
-	};
+	// 		// Check if the server responded with a non-200 status code
+	// 		if (res.status !== 200) {
+	// 			// Show toast of error returned by Axios
+	// 			toast.error(res.data.error);
+	// 		} else {
+	// 			storeInSession("user", JSON.stringify(res.data));
+	// 			setUserAuth(res.data);
+	// 			toast.success("Login successful!");
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Request failed:", error);
+	// 		toast.error("A network error occurred");
+	// 	}
+	// };
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -85,24 +83,24 @@ const UserAuth = ({ type }) => {
 		userAuthThroughServer(serverRoute, formData);
 	};
 
-	const handleGoogleAuth = (e) => {
-		e.preventDefault();
+	// const handleGoogleAuth = (e) => {
+	// 	e.preventDefault();
 
-		authWithGoogle()
-			.then((user) => {
-				let serverRoute = "/auth/google";
+	// 	authWithGoogle()
+	// 		.then((user) => {
+	// 			let serverRoute = "/auth/google";
 
-				let formData = {
-					access_token: user.accessToken,
-				};
+	// 			let formData = {
+	// 				access_token: user.accessToken,
+	// 			};
 
-				userAuthThroughServer(serverRoute, formData);
-			})
-			.catch((err) => {
-				toast.error("Error logging in with Google");
-				console.log(err);
-			});
-	};
+	// 			userAuthThroughServer(serverRoute, formData);
+	// 		})
+	// 		.catch((err) => {
+	// 			toast.error("Error logging in with Google");
+	// 			console.log(err);
+	// 		});
+	// };
 
 	return access_token ? (
 		<Navigate to="/" />
@@ -159,17 +157,7 @@ const UserAuth = ({ type }) => {
 						<hr className="w-1/2 border-black" />
 					</div>
 
-					<button
-						className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
-						onClick={handleGoogleAuth}
-					>
-						<img
-							src={googleIcon}
-							alt="google icon"
-							className="w-5"
-						/>
-						continue with google
-					</button>
+					<GoogleAuthButton serverRoute="/auth/google" />
 
 					{type === "sign-in" ? (
 						<p className="mt-6 text-dark-grey text-xl text-center">

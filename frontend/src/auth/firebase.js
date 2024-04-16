@@ -11,22 +11,15 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig);
-
-// Google auth
 const provider = new GoogleAuthProvider();
-
 const auth = getAuth();
 
 export const authWithGoogle = async () => {
-	let user = null;
-
-	await signInWithPopup(auth, provider)
-		.then((result) => {
-			user = result.user;
-		})
-		.catch((err) => {
-			console.log(err);
-		});
-
-	return user;
+	try {
+		const result = await signInWithPopup(auth, provider);
+		return result.user;
+	} catch (error) {
+		console.log("Authentication with Google failed:", error);
+		throw error;
+	}
 };
