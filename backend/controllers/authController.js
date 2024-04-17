@@ -28,6 +28,10 @@ export const signup = async (req, res) => {
 		await user.save();
 		res.status(200).json(formatDataToSend(user));
 	} catch (err) {
+		// Return more readable error for duplicate email address
+		if (err.code === 11000) {
+			return res.status(409).json({ error: "Email already exists" });
+		}
 		res.status(500).json({ error: err.message });
 	}
 };
@@ -38,28 +42,29 @@ export const signin = async (req, res) => {
 	try {
 		// Validate if email exists in MongoDB
 		const user = await User.findOne({ "personal_info.email": email });
-		if (!user) {
-			return res.status(403).json({ error: "Email not found" });
-		}
 
-		// Only check if account wasn't registered with Google
-		if (!user.google_auth) {
-			// Compare PW provided to PW stored in MongoDB to authenticate user
+		// Check password only if user exists and isn't registed via Google
+		if (user && !user.google_auth) {
 			const isMatch = await bcrypt.compare(
 				password,
 				user.personal_info.password
 			);
-			if (!isMatch) {
-				return res.status(403).json({ error: "Incorrect password" });
-			} else {
-				res.status(200).json(formatDataToSend(user));
+			if (isMatch) {
+				return res.status(200).json(formatDataToSend(user));
 			}
-		} else {
-			return res.status(403).json({
+		}
+
+		// Handle Google auth and other errors
+		if (user && user.google_auth) {
+			return res.status(409).json({
 				error:
-					"Account was created using Google. Please try logging in with Google.",
+					'This account was created using Google. Please try logging in using "Continue with Google"',
 			});
 		}
+
+		return res
+			.status(401)
+			.json({ error: "Authentication failed: Incorrect username or password" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -84,7 +89,7 @@ export const google = async (req, res) => {
 		// If user already exists
 		if (user) {
 			if (!user.google_auth) {
-				return res.status(403).json({
+				return res.status(409).json({
 					error:
 						"This account has already been registered. Please sign in using email and password.",
 				});
