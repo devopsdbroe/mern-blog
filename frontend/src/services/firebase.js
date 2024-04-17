@@ -10,24 +10,16 @@ const firebaseConfig = {
 	appId: "1:575491455237:web:b104538ac2ca6c73a71f6c",
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Google auth
+initializeApp(firebaseConfig);
 const provider = new GoogleAuthProvider();
-
 const auth = getAuth();
 
 export const authWithGoogle = async () => {
-	let user = null;
-
-	await signInWithPopup(auth, provider)
-		.then((result) => {
-			user = result.user;
-		})
-		.catch((err) => {
-			console.log(err);
-		});
-
-	return user;
+	try {
+		const result = await signInWithPopup(auth, provider);
+		return result.user;
+	} catch (error) {
+		console.log("Authentication with Google failed:", error);
+		throw error;
+	}
 };

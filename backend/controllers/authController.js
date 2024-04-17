@@ -2,13 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import { formatDataToSend, generateUsername } from "../utils/authHelpers.js";
 
-import admin from "firebase-admin";
-import serviceAccountKey from "../broe-code-firebase-adminsdk-zy0cu-9e2d82e553.json" assert { type: "json" };
-import { getAuth } from "firebase-admin/auth";
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccountKey),
-});
+import { auth } from "../config/firebase.js";
 
 export const signup = async (req, res) => {
 	try {
@@ -34,6 +28,10 @@ export const signup = async (req, res) => {
 		await user.save();
 		res.status(200).json(formatDataToSend(user));
 	} catch (err) {
+		// Return more readable error for duplicate email address
+		if (err.code === 11000) {
+			return res.status(409).json({ error: "Email already exists" });
+		}
 		res.status(500).json({ error: err.message });
 	}
 };
@@ -44,28 +42,29 @@ export const signin = async (req, res) => {
 	try {
 		// Validate if email exists in MongoDB
 		const user = await User.findOne({ "personal_info.email": email });
-		if (!user) {
-			return res.status(403).json({ error: "Email not found" });
-		}
 
-		// Only check if account wasn't registered with Google
-		if (!user.google_auth) {
-			// Compare PW provided to PW stored in MongoDB to authenticate user
+		// Check password only if user exists and isn't registed via Google
+		if (user && !user.google_auth) {
 			const isMatch = await bcrypt.compare(
 				password,
 				user.personal_info.password
 			);
-			if (!isMatch) {
-				return res.status(403).json({ error: "Incorrect password" });
-			} else {
-				res.status(200).json(formatDataToSend(user));
+			if (isMatch) {
+				return res.status(200).json(formatDataToSend(user));
 			}
-		} else {
-			return res.status(403).json({
+		}
+
+		// Handle Google auth and other errors
+		if (user && user.google_auth) {
+			return res.status(409).json({
 				error:
-					"Account was created using Google. Please try logging in with Google.",
+					'This account was created using Google. Please try logging in using "Continue with Google"',
 			});
 		}
+
+		return res
+			.status(401)
+			.json({ error: "Authentication failed: Incorrect username or password" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -74,64 +73,48 @@ export const signin = async (req, res) => {
 export const google = async (req, res) => {
 	let { access_token } = req.body;
 
-	// Confirm with Google that access token is valid
-	// If token is valid, return the Google user
-	getAuth()
-		.verifyIdToken(access_token)
-		.then(async (decodedUser) => {
-			let { email, name, picture } = decodedUser;
+	try {
+		// Confirm with Google that access token is valid
+		const decodedUser = await auth.verifyIdToken(access_token);
+		let { email, name, picture } = decodedUser;
 
-			// Improve picture resolution
-			picture = picture.replace("s96-c", "s384-c");
+		// Improve picture resolution
+		picture = picture.replace("s96-c", "s384-c");
 
-			// Check MongoDB to see if there is a matching email
-			// If there is a match, get name, email, and profile pic
-			let user = await User.findOne({ "personal_info.email": email })
-				.select(
-					"personal_info.fullname personal_info.email personal_info.profile_img personal_info.username google_auth"
-				)
-				.then((u) => {
-					return u || null;
-				})
-				.catch((err) => {
-					return res.status(500).json({ error: err.message });
+		// Check MongoDB to see if there is a matching email
+		let user = await User.findOne({ "personal_info.email": email }).select(
+			"personal_info.email personal_info.fullname personal_info.profile_img personal_info.username google_auth"
+		);
+
+		// If user already exists
+		if (user) {
+			if (!user.google_auth) {
+				return res.status(409).json({
+					error:
+						"This account has already been registered. Please sign in using email and password.",
 				});
-
-			if (user) {
-				if (!user.google_auth) {
-					return res.status(403).json({
-						error:
-							"This Google account has already been registered. Please sign in using password.",
-					});
-				}
-			} else {
-				let username = await generateUsername(email);
-
-				user = new User({
-					personal_info: {
-						fullname: name,
-						email,
-						profile_img: picture,
-						username,
-					},
-					google_auth: true,
-				});
-
-				await user
-					.save()
-					.then((u) => {
-						user = u;
-					})
-					.catch((err) => {
-						return res.status(500).json({ error: err.message });
-					});
 			}
-			return res.status(200).json(formatDataToSend(user));
-		})
-		.catch((err) => {
-			return res.status(500).json({
-				error:
-					"Failed to authenticate you with Google. Please try with another account.",
+		} else {
+			// Gernerate username if user doesn't exist already
+			let username = await generateUsername(email);
+			user = new User({
+				personal_info: {
+					fullname: name,
+					email,
+					profile_img: picture,
+					username,
+				},
+				google_auth: true,
 			});
+
+			await user.save();
+		}
+
+		return res.status(200).json(formatDataToSend(user));
+	} catch (error) {
+		return res.status(500).json({
+			error:
+				"Failed to authenticate to Google. Please try with another Google account.",
 		});
+	}
 };
