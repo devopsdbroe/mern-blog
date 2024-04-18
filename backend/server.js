@@ -20,14 +20,17 @@ const s3 = new aws.S3({
 export const generateUploadURL = async () => {
 	const date = new Date();
 	const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+	const contentType = "image/jpeg";
 
 	// Get signed URL using S3 keys
-	return await s3.getSignedUrlPromise("putObject", {
+	const uploadURL = await s3.getSignedUrlPromise("putObject", {
 		Bucket: "broe-code",
 		Key: imageName,
 		Expires: 1000,
-		ContentType: "image/jpeg",
+		ContentType: contentType,
 	});
+
+	return { uploadURL, contentType };
 };
 
 const app = express();
