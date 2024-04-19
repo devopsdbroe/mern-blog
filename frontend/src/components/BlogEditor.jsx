@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import defaultBanner from "../assets/blog banner.png";
@@ -6,6 +6,8 @@ import AnimationWrapper from "./AnimationWrapper";
 import { uploadImage } from "../services/aws";
 import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/Editor";
+import EditorJS from "@editorjs/editorjs";
+import { tools } from "./Tools";
 
 const BlogEditor = () => {
 	const {
@@ -13,6 +15,20 @@ const BlogEditor = () => {
 		blog: { title, banner, content, tags, description },
 		setBlog,
 	} = useContext(EditorContext);
+
+	useEffect(() => {
+		const editor = new EditorJS({
+			holder: "textEditor",
+			data: "",
+			tools: tools,
+			placeholder: "Let's write an awesome story!",
+		});
+
+		// Clean up function
+		return () => {
+			editor.destroy();
+		};
+	}, []);
 
 	const handleBannerUpload = (e) => {
 		const img = e.target.files[0];
@@ -64,7 +80,11 @@ const BlogEditor = () => {
 		<>
 			<nav className="navbar">
 				<Link to="/">
-					<img src={Logo} alt="logo" className="flex-none w-10" />
+					<img
+						src={Logo}
+						alt="logo"
+						className="flex-none w-10"
+					/>
 				</Link>
 				<p className="max-md:hidden text-black line-clamp-1 w-full">
 					{title.length ? title : "New Blog"}
@@ -105,6 +125,11 @@ const BlogEditor = () => {
 						></textarea>
 
 						<hr className="w-full opacity-10 my-5" />
+
+						<div
+							id="textEditor"
+							className="font-gelasio"
+						></div>
 					</div>
 				</section>
 			</AnimationWrapper>
