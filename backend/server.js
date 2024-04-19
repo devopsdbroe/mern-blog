@@ -7,32 +7,6 @@ import awsS3Routes from "./routes/awsS3Routes.js";
 import { errorHandler } from "./middleware/validationMiddleware.js";
 import connectDB from "./config/db.js";
 
-import aws from "aws-sdk";
-import { nanoid } from "nanoid";
-
-// Setting up S3 bucket
-const s3 = new aws.S3({
-	region: "us-east-1",
-	accessKeyId: process.env.AWS_ACCESS_KEY,
-	secretAccessKey: process.env.AWS_SECRET_KEY,
-});
-
-export const generateUploadURL = async () => {
-	const date = new Date();
-	const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
-	const contentType = "image/jpeg";
-
-	// Get signed URL using S3 keys
-	const uploadURL = await s3.getSignedUrlPromise("putObject", {
-		Bucket: "broe-code",
-		Key: imageName,
-		Expires: 1000,
-		ContentType: contentType,
-	});
-
-	return { uploadURL, contentType };
-};
-
 const app = express();
 app.use(express.json());
 app.use(cors());
