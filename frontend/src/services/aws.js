@@ -1,23 +1,23 @@
 import axios from "axios";
 
 export const uploadImage = async (img) => {
-	let imgUrl = null;
+	try {
+		// Make request to server to get uploadUrl
+		const res = await axios.get(
+			`${import.meta.env.VITE_SERVER_DOMAIN}/s3/get-upload-url`
+		);
+		const { uploadUrl, contentType } = res.data;
 
-	// Make request to server to get uploadUrl
-	await axios
-		.get(`${import.meta.env.VITE_SERVER_DOMAIN}/s3/get-upload-url`)
-		.then(async ({ data: { uploadUrl, contentType } }) => {
-			await axios({
-				method: "PUT",
-				url: uploadUrl,
-				headers: {
-					"Content-Type": contentType,
-				},
-				data: img,
-			}).then(() => {
-				imgUrl = uploadUrl.split("?")[0];
-			});
+		// Upload image to the provided URL
+		await axios.put(uploadUrl, img, {
+			headers: {
+				"Content-Type": contentType,
+			},
 		});
 
-	return imgUrl;
+		// Return the base URL without query parameters
+		return uploadUrl.split("?")[0];
+	} catch (error) {
+		console.error("Failed to upload image:", error);
+	}
 };
