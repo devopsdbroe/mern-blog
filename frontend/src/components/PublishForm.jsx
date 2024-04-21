@@ -89,7 +89,9 @@ const PublishForm = () => {
 		}
 
 		if (!tags.length) {
-			toast.error("Please add at least one tag to help us rank your blog post");
+			return toast.error(
+				"Please add at least one tag to help us rank your blog post"
+			);
 		}
 
 		// Send data to backend

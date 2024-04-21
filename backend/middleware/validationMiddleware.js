@@ -4,16 +4,53 @@ import jwt from "jsonwebtoken";
 export const validateSignup = (req, res, next) => {
 	const { fullname, email, password } = req.body;
 
-	// Validate name and email length
-	// Validate email requirements
-	// Validate PW requirements
-	if (
-		fullname.length < 3 ||
-		!email.length ||
-		!emailRegex.test(email) ||
-		!passwordRegex.test(password)
-	) {
-		return res.status(400).json({ error: "Validation error" });
+	if (fullname.trim().length < 3) {
+		return res
+			.status(400)
+			.json({ error: "Full name must  be at least 3 characters long" });
+	}
+
+	if (!email.trim().length || !emailRegex.test(email)) {
+		return res
+			.status(400)
+			.json({ error: "Please enter a valid email address" });
+	}
+
+	if (!passwordRegex.test(password)) {
+		return res
+			.status(400)
+			.json({ error: "Password does not meet requirements" });
+	}
+
+	next();
+};
+
+export const validateBlogData = (req, res, next) => {
+	const { title, banner, description, content, tags, draft } = req.body;
+	if (!title.trim().length) {
+		return res.status(400).json({ error: "You must provide a title" });
+	}
+	if (!draft) {
+		if (!description.trim().length || description.length > 200) {
+			return res.status(400).json({
+				error: "HELLO",
+			});
+		}
+		if (!banner.trim().length) {
+			return res
+				.status(400)
+				.json({ error: "You must provide a banner image to publish" });
+		}
+		if (!content.blocks.length) {
+			return res
+				.status(400)
+				.json({ error: "There must be some content to publish" });
+		}
+		if (!tags.length || tags.length > 10) {
+			return res.status(400).json({
+				error: "Please provide the appropriate amount of tags to publish",
+			});
+		}
 	}
 	next();
 };
