@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import defaultBanner from "../assets/blog banner.png";
 import AnimationWrapper from "./AnimationWrapper";
@@ -8,6 +8,8 @@ import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/Editor";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
+import axios from "axios";
+import { UserContext } from "../context/UserProvider";
 
 const BlogEditor = () => {
 	const {
@@ -18,6 +20,12 @@ const BlogEditor = () => {
 		textEditor,
 		setTextEditor,
 	} = useContext(EditorContext);
+
+	const {
+		userAuth: { access_token },
+	} = useContext(UserContext);
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		setTextEditor(
@@ -105,6 +113,63 @@ const BlogEditor = () => {
 		}
 	};
 
+	const handleSaveDraft = (e) => {
+		if (e.target.className.includes("disable")) {
+			return;
+		}
+
+		// Validate all input fields
+		if (!title.length) {
+			return toast.error("Please add a blog title");
+		}
+
+		// Send data to backend
+		let loadingToast = toast.loading("Saving Draft...");
+
+		e.target.classList.add("disable");
+
+		if (textEditor.isReady) {
+			textEditor.save().then((content) => {
+				let blogObj = {
+					title,
+					banner,
+					description,
+					content,
+					tags,
+					draft: true,
+				};
+
+				axios
+					.post(
+						`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
+						blogObj,
+						{
+							headers: {
+								Authorization: `Bearer ${access_token}`,
+							},
+						}
+					)
+					.then(() => {
+						e.target.classList.remove("disable");
+
+						toast.dismiss(loadingToast);
+						toast.success("Saved successfully!");
+
+						// TODO: Send user to dashboard (still need to create)
+						setTimeout(() => {
+							navigate("/");
+						}, 500);
+					})
+					.catch(({ response }) => {
+						e.target.classList.remove("disable");
+
+						toast.dismiss(loadingToast);
+						return toast.error(response.data.error);
+					});
+			});
+		}
+	};
+
 	return (
 		<>
 			<nav className="navbar">
@@ -126,7 +191,12 @@ const BlogEditor = () => {
 					>
 						Publish
 					</button>
-					<button className="btn-light py-2">Save Draft</button>
+					<button
+						className="btn-light py-2"
+						onClick={handleSaveDraft}
+					>
+						Save Draft
+					</button>
 				</div>
 			</nav>
 			<Toaster />

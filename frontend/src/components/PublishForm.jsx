@@ -118,7 +118,7 @@ const PublishForm = () => {
 				toast.dismiss(loadingToast);
 				toast.success("Published successfully!");
 
-				// Send user to home page
+				// TODO: Send user to dashboard (still need to create)
 				setTimeout(() => {
 					navigate("/");
 				}, 500);

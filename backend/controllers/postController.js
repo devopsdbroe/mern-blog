@@ -17,33 +17,33 @@ export const createBlog = (req, res) => {
 
 	// Validate incoming data
 	if (!title.length) {
-		return res
-			.status(403)
-			.json({ error: "You must provide a title to publish the blog" });
+		return res.status(403).json({ error: "You must provide a title" });
 	}
 
-	if (!description.length || description.length > 200) {
-		return res.status(403).json({
-			error: "You must provide a blog description under 200 characters",
-		});
-	}
+	if (!draft) {
+		if (!description.length || description.length > 200) {
+			return res.status(403).json({
+				error: "You must provide a blog description under 200 characters",
+			});
+		}
 
-	if (!banner.length) {
-		return res
-			.status(403)
-			.json({ error: "You must provide a banner image to publish" });
-	}
+		if (!banner.length) {
+			return res
+				.status(403)
+				.json({ error: "You must provide a banner image to publish" });
+		}
 
-	if (!content.blocks.length) {
-		return res
-			.status(403)
-			.json({ error: "There must be some content to publish" });
-	}
+		if (!content.blocks.length) {
+			return res
+				.status(403)
+				.json({ error: "There must be some content to publish" });
+		}
 
-	if (!tags.length || tags.length > 10) {
-		return res.status(403).json({
-			error: "Please provide the appropriate amount of tags to publish",
-		});
+		if (!tags.length || tags.length > 10) {
+			return res.status(403).json({
+				error: "Please provide the appropriate amount of tags to publish",
+			});
+		}
 	}
 
 	// Convert tags to lowercase
