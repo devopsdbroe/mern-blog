@@ -3,6 +3,6 @@ import { getUploadUrl } from "../controllers/awsS3Controller.js";
 
 const router = express.Router();
 
-router.get("/get-upload-url", getUploadUrl);
+router.get("/getUploadUrl", getUploadUrl);
 
 export default router;

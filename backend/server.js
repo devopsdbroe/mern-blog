@@ -4,6 +4,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 import awsS3Routes from "./routes/awsS3Routes.js";
+import postRoutes from "./routes/postRoutes.js";
 import { errorHandler } from "./middleware/validationMiddleware.js";
 import connectDB from "./config/db.js";
 
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use("/auth", authRoutes);
 app.use("/s3", awsS3Routes);
+app.use("/post", postRoutes);
 app.use(errorHandler);
 
 connectDB();

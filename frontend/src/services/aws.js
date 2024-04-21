@@ -4,7 +4,7 @@ export const uploadImage = async (img) => {
 	try {
 		// Make request to server to get uploadUrl
 		const res = await axios.get(
-			`${import.meta.env.VITE_SERVER_DOMAIN}/s3/get-upload-url`
+			`${import.meta.env.VITE_SERVER_DOMAIN}/s3/getUploadUrl`
 		);
 		const { uploadUrl, contentType } = res.data;
 
