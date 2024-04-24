@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import UserAuth from "./pages/UserAuth";
 import { UserProvider } from "./context/UserProvider";
 import Editor from "./pages/Editor";
+import Home from "./pages/Home";
 
 function App() {
 	return (
@@ -16,6 +17,10 @@ function App() {
 					path="/"
 					element={<Navbar />}
 				>
+					<Route
+						index
+						element={<Home />}
+					/>
 					<Route
 						path="signin"
 						element={<UserAuth type="sign-in" />}
