@@ -1,5 +1,5 @@
 import express from "express";
-import { createBlog } from "../controllers/postController.js";
+import { createBlog, getLatestBlogs } from "../controllers/postController.js";
 import {
 	validateBlogData,
 	validateJWT,
@@ -8,5 +8,6 @@ import {
 const router = express.Router();
 
 router.post("/createBlog", validateJWT, validateBlogData, createBlog);
+router.get("/getLatestBlogs", getLatestBlogs);
 
 export default router;
