@@ -198,10 +198,10 @@ const PublishForm = () => {
 							onKeyDown={handleTagKeyDown}
 						/>
 
-						{tags.map((tag, index) => (
+						{tags.map((tag, i) => (
 							<Tag
-								key={index}
-								tagIndex={index}
+								key={i}
+								tagIndex={i}
 								tag={tag}
 							/>
 						))}

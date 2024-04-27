@@ -62,7 +62,7 @@ export const getLatestBlogs = (req, res) => {
 			"personal_info.fullname personal_info.username personal_info.profile_img -_id"
 		)
 		.sort({ publishedAt: -1 })
-		.select("blog_id title descriptio banner activity tags publishedAt -_id")
+		.select("blog_id title description banner activity tags publishedAt -_id")
 		.limit(maxLimit)
 		.then((blogs) => {
 			return res.status(200).json({ blogs });

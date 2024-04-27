@@ -11,13 +11,13 @@ const InPageNavigation = ({
 	const activeTabLineRef = useRef();
 	const activeTab = useRef();
 
-	const changePageState = (btn, index) => {
+	const changePageState = (btn, i) => {
 		const { offsetWidth, offsetLeft } = btn;
 
 		activeTabLineRef.current.style.width = offsetWidth + "px";
 		activeTabLineRef.current.style.left = offsetLeft + "px";
 
-		setInPageNavIndex(index);
+		setInPageNavIndex(i);
 	};
 
 	useEffect(() => {
@@ -27,15 +27,15 @@ const InPageNavigation = ({
 	return (
 		<>
 			<div className="relative mb-8 bg-white border-b border-grey flex flex-nowrap overflow-x-auto">
-				{routes.map((route, index) => (
+				{routes.map((route, i) => (
 					<button
-						ref={index === defualtActiveIndex ? activeTab : null}
-						key={index}
+						ref={i === defualtActiveIndex ? activeTab : null}
+						key={i}
 						className={`p-4 px-5 capitalize ${
-							inPageNavIndex === index ? "text-black" : "text-dark-grey"
+							inPageNavIndex === i ? "text-black" : "text-dark-grey"
 						} ${defaultHidden.includes(route) && "md:hidden"}`}
 						onClick={(e) => {
-							changePageState(e.target, index);
+							changePageState(e.target, i);
 						}}
 					>
 						{route}
