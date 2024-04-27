@@ -4,9 +4,11 @@ import InPageNavigation from "../components/InPageNavigation";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import BlogCard from "../components/BlogCard";
+import MinimalBlogCard from "../components/MinimalBlogCard";
 
 const Home = () => {
 	const [blogs, setBlogs] = useState(null);
+	const [trendingBlogs, setTrendingBlogs] = useState(null);
 
 	const fetchLatestBlogs = () => {
 		axios
@@ -19,8 +21,20 @@ const Home = () => {
 			});
 	};
 
+	const fetchTrendingBlogs = () => {
+		axios
+			.get(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getTrendingBlogs`)
+			.then(({ data }) => {
+				setTrendingBlogs(data.blogs);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
 	useEffect(() => {
 		fetchLatestBlogs();
+		fetchTrendingBlogs();
 	}, []);
 
 	return (
@@ -36,23 +50,35 @@ const Home = () => {
 							{blogs === null ? (
 								<Loader />
 							) : (
-								blogs.map((blog, i) => {
-									return (
-										<AnimationWrapper
-											transition={{ duration: 1, delay: i * 0.1 }}
-											key={i}
-										>
-											<BlogCard
-												content={blog}
-												author={blog.author.personal_info}
-											/>
-										</AnimationWrapper>
-									);
-								})
+								blogs.map((blog, i) => (
+									<AnimationWrapper
+										transition={{ duration: 1, delay: i * 0.1 }}
+										key={i}
+									>
+										<BlogCard
+											content={blog}
+											author={blog.author.personal_info}
+										/>
+									</AnimationWrapper>
+								))
 							)}
 						</>
 
-						<h1>Trending Blogs</h1>
+						{trendingBlogs === null ? (
+							<Loader />
+						) : (
+							trendingBlogs.map((blog, i) => (
+								<AnimationWrapper
+									key={i}
+									transition={{ duration: 1, delay: i * 0.1 }}
+								>
+									<MinimalBlogCard
+										blog={blog}
+										index={i}
+									/>
+								</AnimationWrapper>
+							))
+						)}
 					</InPageNavigation>
 				</div>
 
