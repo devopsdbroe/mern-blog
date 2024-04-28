@@ -5,10 +5,22 @@ import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import BlogCard from "../components/BlogCard";
 import MinimalBlogCard from "../components/MinimalBlogCard";
+import { activeTabRef } from "../components/InPageNavigation";
 
 const Home = () => {
 	const [blogs, setBlogs] = useState(null);
 	const [trendingBlogs, setTrendingBlogs] = useState(null);
+	const [pageState, setPageState] = useState("home");
+
+	const categories = [
+		"programming",
+		"sports",
+		"movies",
+		"shows",
+		"tech",
+		"finances",
+		"travel",
+	];
 
 	const fetchLatestBlogs = () => {
 		axios
@@ -33,9 +45,34 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		fetchLatestBlogs();
-		fetchTrendingBlogs();
-	}, []);
+		// Run useEffect every time category changes
+		// Update hr element to match category length
+		activeTabRef.current.click();
+
+		// Only fetch latest blogs if filter is set to "home"
+		if (pageState === "home") {
+			fetchLatestBlogs();
+		}
+
+		// Only fetch trending blogs if state is null
+		if (!trendingBlogs) {
+			fetchTrendingBlogs();
+		}
+	}, [pageState]);
+
+	const loadBlogByCategory = (e) => {
+		// Get the category name (e.g. "programming")
+		const category = e.target.innerText.toLowerCase();
+
+		setBlogs(null);
+
+		if (pageState === category) {
+			setPageState("home");
+			return;
+		}
+
+		setPageState(category);
+	};
 
 	return (
 		<AnimationWrapper>
@@ -43,7 +80,7 @@ const Home = () => {
 				{/* Latest blogs */}
 				<div className="w-full">
 					<InPageNavigation
-						routes={["home", "trending blogs"]}
+						routes={[pageState, "trending blogs"]}
 						defaultHidden={["trending blogs"]}
 					>
 						<>
@@ -83,7 +120,51 @@ const Home = () => {
 				</div>
 
 				{/* Filters and trending */}
-				<div></div>
+				<div className="min-w-[40%] lg:min-w-[400px] max-w-min border-l border-grey pl-8 pt-3 max-md:hidden">
+					<div className="flex flex-col gap-10">
+						<div>
+							<h1 className="font-medium text-xl mb-8">
+								Stories from all interests
+							</h1>
+
+							<div className="flex gap-3 flex-wrap">
+								{categories.map((category, i) => (
+									<button
+										key={i}
+										className={`tag ${
+											pageState === category && "bg-black text-white"
+										}`}
+										onClick={loadBlogByCategory}
+									>
+										{category}
+									</button>
+								))}
+							</div>
+						</div>
+
+						<div>
+							<h1 className="font-medium text-xl mb-8">
+								Trending <i className="fi fi-rr-arrow-trend-up"></i>
+							</h1>
+
+							{trendingBlogs === null ? (
+								<Loader />
+							) : (
+								trendingBlogs.map((blog, i) => (
+									<AnimationWrapper
+										key={i}
+										transition={{ duration: 1, delay: i * 0.1 }}
+									>
+										<MinimalBlogCard
+											blog={blog}
+											index={i}
+										/>
+									</AnimationWrapper>
+								))
+							)}
+						</div>
+					</div>
+				</div>
 			</section>
 		</AnimationWrapper>
 	);

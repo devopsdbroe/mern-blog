@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
+export let activeTabLineRef;
+export let activeTabRef;
+
 const InPageNavigation = ({
 	children,
 	routes,
@@ -8,8 +11,8 @@ const InPageNavigation = ({
 }) => {
 	const [inPageNavIndex, setInPageNavIndex] = useState(defualtActiveIndex);
 
-	const activeTabLineRef = useRef();
-	const activeTab = useRef();
+	activeTabLineRef = useRef();
+	activeTabRef = useRef();
 
 	const changePageState = (btn, i) => {
 		const { offsetWidth, offsetLeft } = btn;
@@ -21,7 +24,7 @@ const InPageNavigation = ({
 	};
 
 	useEffect(() => {
-		changePageState(activeTab.current, defualtActiveIndex);
+		changePageState(activeTabRef.current, defualtActiveIndex);
 	}, []);
 
 	return (
@@ -29,7 +32,7 @@ const InPageNavigation = ({
 			<div className="relative mb-8 bg-white border-b border-grey flex flex-nowrap overflow-x-auto">
 				{routes.map((route, i) => (
 					<button
-						ref={i === defualtActiveIndex ? activeTab : null}
+						ref={i === defualtActiveIndex ? activeTabRef : null}
 						key={i}
 						className={`p-4 px-5 capitalize ${
 							inPageNavIndex === i ? "text-black" : "text-dark-grey"
