@@ -92,3 +92,28 @@ export const getTrendingBlogs = (req, res) => {
 			return res.status(500).json({ error: err.message });
 		});
 };
+
+export const searchBlogs = (req, res) => {
+	// Filter according to tag
+	const { tag } = req.body;
+
+	// Check if tags array contains the tag provided from req.body
+	const findQuery = { tags: tag, draft: false };
+
+	const maxLimit = 5;
+
+	Blog.find(findQuery)
+		.populate(
+			"author",
+			"personal_info.fullname personal_info.username personal_info.profile_img -_id"
+		)
+		.sort({ publishedAt: -1 })
+		.select("blog_id title description banner activity tags publishedAt -_id")
+		.limit(maxLimit)
+		.then((blogs) => {
+			return res.status(200).json({ blogs });
+		})
+		.catch((err) => {
+			return res.status(500).json({ error: err.message });
+		});
+};
