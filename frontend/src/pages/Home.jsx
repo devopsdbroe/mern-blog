@@ -14,7 +14,7 @@ const Home = () => {
 
 	const categories = [
 		"programming",
-		"sports",
+		"patriots",
 		"movies",
 		"shows",
 		"tech",
@@ -25,6 +25,19 @@ const Home = () => {
 	const fetchLatestBlogs = () => {
 		axios
 			.get(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getLatestBlogs`)
+			.then(({ data }) => {
+				setBlogs(data.blogs);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
+	const fetchBlogsByCategory = () => {
+		axios
+			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/searchBlogs`, {
+				tag: pageState,
+			})
 			.then(({ data }) => {
 				setBlogs(data.blogs);
 			})
@@ -52,6 +65,8 @@ const Home = () => {
 		// Only fetch latest blogs if filter is set to "home"
 		if (pageState === "home") {
 			fetchLatestBlogs();
+		} else {
+			fetchBlogsByCategory();
 		}
 
 		// Only fetch trending blogs if state is null
