@@ -6,10 +6,11 @@ import Loader from "../components/Loader";
 import BlogCard from "../components/BlogCard";
 import MinimalBlogCard from "../components/MinimalBlogCard";
 import { activeTabRef } from "../components/InPageNavigation";
+import NoDataMessage from "../components/NoDataMessage";
 
 const Home = () => {
 	const [blogs, setBlogs] = useState(null);
-	const [trendingBlogs, setTrendingBlogs] = useState(null);
+	const [trendingBlogs, setTrendingBlogs] = useState([]);
 	const [pageState, setPageState] = useState("home");
 
 	const categories = [
@@ -101,7 +102,7 @@ const Home = () => {
 						<>
 							{blogs === null ? (
 								<Loader />
-							) : (
+							) : blogs.length ? (
 								blogs.map((blog, i) => (
 									<AnimationWrapper
 										transition={{ duration: 1, delay: i * 0.1 }}
@@ -113,12 +114,14 @@ const Home = () => {
 										/>
 									</AnimationWrapper>
 								))
+							) : (
+								<NoDataMessage message="No blogs with this tag found" />
 							)}
 						</>
 
 						{trendingBlogs === null ? (
 							<Loader />
-						) : (
+						) : trendingBlogs.length ? (
 							trendingBlogs.map((blog, i) => (
 								<AnimationWrapper
 									key={i}
@@ -130,6 +133,8 @@ const Home = () => {
 									/>
 								</AnimationWrapper>
 							))
+						) : (
+							<NoDataMessage message="No trending blogs found" />
 						)}
 					</InPageNavigation>
 				</div>
@@ -164,7 +169,7 @@ const Home = () => {
 
 							{trendingBlogs === null ? (
 								<Loader />
-							) : (
+							) : trendingBlogs.length ? (
 								trendingBlogs.map((blog, i) => (
 									<AnimationWrapper
 										key={i}
@@ -176,6 +181,8 @@ const Home = () => {
 										/>
 									</AnimationWrapper>
 								))
+							) : (
+								<NoDataMessage message="No trending blogs found" />
 							)}
 						</div>
 					</div>
