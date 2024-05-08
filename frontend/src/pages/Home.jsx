@@ -7,6 +7,8 @@ import BlogCard from "../components/BlogCard";
 import MinimalBlogCard from "../components/MinimalBlogCard";
 import { activeTabRef } from "../components/InPageNavigation";
 import NoDataMessage from "../components/NoDataMessage";
+import { filterPaginationData } from "../components/FilterPaginationData";
+import LoadMoreDataBtn from "../components/LoadMoreDataBtn";
 
 const Home = () => {
 	const [blogs, setBlogs] = useState(null);
@@ -23,24 +25,42 @@ const Home = () => {
 		"travel",
 	];
 
-	const fetchLatestBlogs = () => {
+	const fetchLatestBlogs = ({ page = 1 }) => {
 		axios
-			.get(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getLatestBlogs`)
-			.then(({ data }) => {
-				setBlogs(data.blogs);
+			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getLatestBlogs`, {
+				page,
+			})
+			.then(async ({ data }) => {
+				let formattedData = await filterPaginationData({
+					state: blogs,
+					data: data.blogs,
+					page,
+					countRoute: "/post/getAllLatestBlogsCount",
+				});
+
+				setBlogs(formattedData);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 
-	const fetchBlogsByCategory = () => {
+	const fetchBlogsByCategory = ({ page = 1 }) => {
 		axios
 			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/searchBlogs`, {
 				tag: pageState,
+				page,
 			})
-			.then(({ data }) => {
-				setBlogs(data.blogs);
+			.then(async ({ data }) => {
+				let formattedData = await filterPaginationData({
+					state: blogs,
+					data: data.blogs,
+					page,
+					countRoute: "/post/searchBlogsCount",
+					data_to_send: { tag: pageState },
+				});
+
+				setBlogs(formattedData);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -65,9 +85,9 @@ const Home = () => {
 
 		// Only fetch latest blogs if filter is set to "home"
 		if (pageState === "home") {
-			fetchLatestBlogs();
+			fetchLatestBlogs({ page: 1 });
 		} else {
-			fetchBlogsByCategory();
+			fetchBlogsByCategory({ page: 1 });
 		}
 
 		// Only fetch trending blogs if state is null
@@ -102,8 +122,8 @@ const Home = () => {
 						<>
 							{blogs === null ? (
 								<Loader />
-							) : blogs.length ? (
-								blogs.map((blog, i) => (
+							) : blogs.results.length ? (
+								blogs.results.map((blog, i) => (
 									<AnimationWrapper
 										transition={{ duration: 1, delay: i * 0.1 }}
 										key={i}
@@ -115,8 +135,14 @@ const Home = () => {
 									</AnimationWrapper>
 								))
 							) : (
-								<NoDataMessage message="No blogs with this tag found" />
+								<NoDataMessage message="No blogs found" />
 							)}
+							<LoadMoreDataBtn
+								state={blogs}
+								fetchData={
+									pageState === "home" ? fetchLatestBlogs : fetchBlogsByCategory
+								}
+							/>
 						</>
 
 						{trendingBlogs === null ? (
@@ -127,10 +153,7 @@ const Home = () => {
 									key={i}
 									transition={{ duration: 1, delay: i * 0.1 }}
 								>
-									<MinimalBlogCard
-										blog={blog}
-										index={i}
-									/>
+									<MinimalBlogCard blog={blog} index={i} />
 								</AnimationWrapper>
 							))
 						) : (
@@ -175,10 +198,7 @@ const Home = () => {
 										key={i}
 										transition={{ duration: 1, delay: i * 0.1 }}
 									>
-										<MinimalBlogCard
-											blog={blog}
-											index={i}
-										/>
+										<MinimalBlogCard blog={blog} index={i} />
 									</AnimationWrapper>
 								))
 							) : (
