@@ -12,7 +12,7 @@ import LoadMoreDataBtn from "../components/LoadMoreDataBtn";
 
 const Home = () => {
 	const [blogs, setBlogs] = useState(null);
-	const [trendingBlogs, setTrendingBlogs] = useState([]);
+	const [trendingBlogs, setTrendingBlogs] = useState(null);
 	const [pageState, setPageState] = useState("home");
 
 	const categories = [
@@ -109,6 +109,8 @@ const Home = () => {
 
 		setPageState(category);
 	};
+
+	console.log(trendingBlogs);
 
 	return (
 		<AnimationWrapper>
