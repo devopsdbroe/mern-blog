@@ -1,9 +1,11 @@
 import express from "express";
 import {
 	createBlog,
+	getAllLatestBlogsCount,
 	getLatestBlogs,
 	getTrendingBlogs,
 	searchBlogs,
+	searchBlogsCount,
 } from "../controllers/postController.js";
 import {
 	validateBlogData,
@@ -13,8 +15,10 @@ import {
 const router = express.Router();
 
 router.post("/createBlog", validateJWT, validateBlogData, createBlog);
-router.get("/getLatestBlogs", getLatestBlogs);
+router.post("/getLatestBlogs", getLatestBlogs);
+router.post("/getAllLatestBlogsCount", getAllLatestBlogsCount);
 router.get("/getTrendingBlogs", getTrendingBlogs);
 router.post("/searchBlogs", searchBlogs);
+router.post("/searchBlogsCount", searchBlogsCount);
 
 export default router;

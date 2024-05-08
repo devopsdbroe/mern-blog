@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import Blog from "../models/blog.js";
 import { generateBlogId } from "../utils/postHelpers.js";
+import { raw } from "express";
 
 export const createBlog = async (req, res) => {
 	// req.user was set to user.id in validateJWT
@@ -54,6 +55,8 @@ export const createBlog = async (req, res) => {
 };
 
 export const getLatestBlogs = (req, res) => {
+	const { page } = req.body;
+
 	const maxLimit = 5;
 
 	Blog.find({ draft: false })
@@ -63,11 +66,23 @@ export const getLatestBlogs = (req, res) => {
 		)
 		.sort({ publishedAt: -1 })
 		.select("blog_id title description banner activity tags publishedAt -_id")
+		.skip((page - 1) * maxLimit)
 		.limit(maxLimit)
 		.then((blogs) => {
 			return res.status(200).json({ blogs });
 		})
 		.catch((err) => {
+			return res.status(500).json({ error: err.message });
+		});
+};
+
+export const getAllLatestBlogsCount = (req, res) => {
+	Blog.countDocuments({ draft: false })
+		.then((count) => {
+			return res.status(200).json({ totalDocs: count });
+		})
+		.catch((err) => {
+			console.log(err.message);
 			return res.status(500).json({ error: err.message });
 		});
 };
@@ -95,12 +110,12 @@ export const getTrendingBlogs = (req, res) => {
 
 export const searchBlogs = (req, res) => {
 	// Filter according to tag
-	const { tag } = req.body;
+	const { tag, page } = req.body;
 
 	// Check if tags array contains the tag provided from req.body
 	const findQuery = { tags: tag, draft: false };
 
-	const maxLimit = 5;
+	const maxLimit = 1;
 
 	Blog.find(findQuery)
 		.populate(
@@ -109,9 +124,24 @@ export const searchBlogs = (req, res) => {
 		)
 		.sort({ publishedAt: -1 })
 		.select("blog_id title description banner activity tags publishedAt -_id")
+		.skip((page - 1) * maxLimit)
 		.limit(maxLimit)
 		.then((blogs) => {
 			return res.status(200).json({ blogs });
+		})
+		.catch((err) => {
+			return res.status(500).json({ error: err.message });
+		});
+};
+
+export const searchBlogsCount = (req, res) => {
+	const { tag } = req.body;
+
+	const findQuery = { tags: tag, draft: false };
+
+	Blog.countDocuments(findQuery)
+		.then((count) => {
+			return res.status(200).json({ totalDocs: count });
 		})
 		.catch((err) => {
 			return res.status(500).json({ error: err.message });
