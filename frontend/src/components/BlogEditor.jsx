@@ -38,25 +38,24 @@ const BlogEditor = () => {
 		);
 	}, []);
 
-	const handleBannerUpload = (e) => {
+	const handleBannerUpload = async (e) => {
 		const img = e.target.files[0];
 
 		if (img) {
 			const loadingToast = toast.loading("Uploading...");
 
-			uploadImage(img)
-				.then((url) => {
-					if (url) {
-						toast.dismiss(loadingToast);
-						toast.success("Upload Successful");
+			try {
+				const url = await uploadImage(img);
 
-						setBlog({ ...blog, banner: url });
-					}
-				})
-				.catch((err) => {
+				if (url) {
 					toast.dismiss(loadingToast);
-					return toast.error(err);
-				});
+					toast.success("Upload Successful");
+					setBlog({ ...blog, banner: url });
+				}
+			} catch (error) {
+				toast.dismiss(loadingToast);
+				return toast.error(error);
+			}
 		}
 	};
 
@@ -84,7 +83,7 @@ const BlogEditor = () => {
 		setBlog({ ...blog, title: input.value });
 	};
 
-	const handlePublishEvent = () => {
+	const handlePublishEvent = async () => {
 		// Validate form data
 		if (!banner.length) {
 			return toast.error("Please upload a blog banner image");
@@ -95,25 +94,23 @@ const BlogEditor = () => {
 		}
 
 		if (textEditor.isReady) {
-			// Convert data from editor into an array
-			textEditor
-				.save()
-				.then((data) => {
-					// Check if there is data in array and add to blog state
-					if (data.blocks.length) {
-						setBlog({ ...blog, content: data });
-						setEditorState("publish");
-					} else {
-						return toast.error("Please add content to your blog");
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-				});
+			try {
+				const data = await textEditor.save();
+
+				// Check if there is data in array and add to blog state
+				if (data.blocks.length) {
+					setBlog({ ...blog, content: data });
+					setEditorState("publish");
+				} else {
+					return toast.error("Please add content to your blog");
+				}
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	};
 
-	const handleSaveDraft = (e) => {
+	const handleSaveDraft = async (e) => {
 		if (e.target.className.includes("disable")) {
 			return;
 		}
@@ -129,7 +126,9 @@ const BlogEditor = () => {
 		e.target.classList.add("disable");
 
 		if (textEditor.isReady) {
-			textEditor.save().then((content) => {
+			try {
+				const content = await textEditor.save();
+
 				const blogObj = {
 					title,
 					banner,
@@ -139,34 +138,31 @@ const BlogEditor = () => {
 					draft: true,
 				};
 
-				axios
-					.post(
-						`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
-						blogObj,
-						{
-							headers: {
-								Authorization: `Bearer ${access_token}`,
-							},
-						}
-					)
-					.then(() => {
-						e.target.classList.remove("disable");
+				await axios.post(
+					`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
+					blogObj,
+					{
+						headers: {
+							Authorization: `Bearer ${access_token}`,
+						},
+					}
+				);
 
-						toast.dismiss(loadingToast);
-						toast.success("Saved successfully!");
+				e.target.classList.remove("disable");
 
-						// TODO: Send user to dashboard (still need to create)
-						setTimeout(() => {
-							navigate("/");
-						}, 500);
-					})
-					.catch(({ response }) => {
-						e.target.classList.remove("disable");
+				toast.dismiss(loadingToast);
+				toast.success("Saved successfully!");
 
-						toast.dismiss(loadingToast);
-						return toast.error(response.data.error);
-					});
-			});
+				// TODO: Send user to dashboard (still need to create)
+				setTimeout(() => {
+					navigate("/");
+				}, 500);
+			} catch ({ response }) {
+				e.target.classList.remove("disable");
+
+				toast.dismiss(loadingToast);
+				return toast.error(response.data.error);
+			}
 		}
 	};
 

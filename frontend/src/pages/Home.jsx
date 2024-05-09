@@ -25,57 +25,62 @@ const Home = () => {
 		"travel",
 	];
 
-	const fetchLatestBlogs = ({ page = 1 }) => {
-		axios
-			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getLatestBlogs`, {
-				page,
-			})
-			.then(async ({ data }) => {
-				const formattedData = await filterPaginationData({
-					state: blogs,
-					data: data.blogs,
+	const fetchLatestBlogs = async ({ page = 1 }) => {
+		try {
+			const { data } = await axios.post(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/getLatestBlogs`,
+				{
 					page,
-					countRoute: "/post/getAllLatestBlogsCount",
-				});
+				}
+			);
 
-				setBlogs(formattedData);
-			})
-			.catch((err) => {
-				console.log(err);
+			const formattedData = await filterPaginationData({
+				state: blogs,
+				data: data.blogs,
+				page,
+				countRoute: "/post/getAllLatestBlogsCount",
 			});
+
+			setBlogs(formattedData);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
-	const fetchBlogsByCategory = ({ page = 1 }) => {
-		axios
-			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/searchBlogs`, {
-				tag: pageState,
-				page,
-			})
-			.then(async ({ data }) => {
-				const formattedData = await filterPaginationData({
-					state: blogs,
-					data: data.blogs,
+	const fetchBlogsByCategory = async ({ page = 1 }) => {
+		try {
+			const { data } = await axios.post(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/searchBlogs`,
+				{
+					tag: pageState,
 					page,
-					countRoute: "/post/searchBlogsCount",
-					data_to_send: { tag: pageState },
-				});
+				}
+			);
 
-				setBlogs(formattedData);
-			})
-			.catch((err) => {
-				console.log(err);
+			const formattedData = await filterPaginationData({
+				state: blogs,
+				data: data.blogs,
+				page,
+				countRoute: "/post/searchBlogsCount",
+				data_to_send: { tag: pageState },
 			});
+
+			setBlogs(formattedData);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
-	const fetchTrendingBlogs = () => {
-		axios
-			.get(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getTrendingBlogs`)
-			.then(({ data }) => {
-				setTrendingBlogs(data.blogs);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+	const fetchTrendingBlogs = async () => {
+		try {
+			const { data } = await axios.get(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/getTrendingBlogs`
+			);
+
+			setTrendingBlogs(data.blogs);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	useEffect(() => {
