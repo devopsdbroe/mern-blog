@@ -1,11 +1,10 @@
 import User from "../models/user.js";
 import Blog from "../models/blog.js";
 import { generateBlogId } from "../utils/postHelpers.js";
-import { raw } from "express";
 
 export const createBlog = async (req, res) => {
 	// req.user was set to user.id in validateJWT
-	let authorId = req.user;
+	const authorId = req.user;
 
 	let {
 		title,
@@ -22,9 +21,9 @@ export const createBlog = async (req, res) => {
 	// Replace any special characters with whitespace
 	// Replace any whitespace with dashes
 	// Trim whitespace and add nanoId
-	let blog_id = generateBlogId(title);
+	const blog_id = generateBlogId(title);
 
-	let blog = new Blog({
+	const blog = new Blog({
 		blog_id,
 		title,
 		banner,
@@ -38,7 +37,7 @@ export const createBlog = async (req, res) => {
 	try {
 		// Save blog post to DB
 		await blog.save();
-		let incrementVal = draft ? 0 : 1;
+		const incrementVal = draft ? 0 : 1;
 
 		// Update user
 		await User.findOneAndUpdate(

@@ -8,10 +8,10 @@ import { UserContext } from "../context/UserProvider";
 import { useNavigate } from "react-router-dom";
 
 const PublishForm = () => {
-	let characterLimit = 200;
-	let tagLimit = 10;
+	const characterLimit = 200;
+	const tagLimit = 10;
 
-	const {
+	let {
 		blog,
 		blog: { banner, title, content, tags, description },
 		setBlog,
@@ -22,20 +22,20 @@ const PublishForm = () => {
 		userAuth: { access_token },
 	} = useContext(UserContext);
 
-	let navigate = useNavigate();
+	const navigate = useNavigate();
 
 	const handleCloseEvent = () => {
 		setEditorState("editor");
 	};
 
 	const handleBlogTitleChange = (e) => {
-		let input = e.target;
+		const input = e.target;
 
 		setBlog({ ...blog, title: input.value });
 	};
 
 	const handleBlogDescriptionChange = (e) => {
-		let input = e.target;
+		const input = e.target;
 
 		setBlog({ ...blog, description: input.value });
 	};
@@ -95,11 +95,11 @@ const PublishForm = () => {
 		}
 
 		// Send data to backend
-		let loadingToast = toast.loading("Publishing...");
+		const loadingToast = toast.loading("Publishing...");
 
 		e.target.classList.add("disable");
 
-		let blogObj = {
+		const blogObj = {
 			title,
 			banner,
 			description,
@@ -149,10 +149,7 @@ const PublishForm = () => {
 					<p className="text-dark-grey mb-1">Preview</p>
 
 					<div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
-						<img
-							src={banner}
-							alt="banner image"
-						/>
+						<img src={banner} alt="banner image" />
 					</div>
 
 					<h1 className="text-4xl font-medium mt-2 leading-tight line-clamp-2">
@@ -199,11 +196,7 @@ const PublishForm = () => {
 						/>
 
 						{tags.map((tag, i) => (
-							<Tag
-								key={i}
-								tagIndex={i}
-								tag={tag}
-							/>
+							<Tag key={i} tagIndex={i} tag={tag} />
 						))}
 					</div>
 
@@ -211,10 +204,7 @@ const PublishForm = () => {
 						{tagLimit - tags.length} tags left
 					</p>
 
-					<button
-						className="btn-dark px-8"
-						onClick={publishBlog}
-					>
+					<button className="btn-dark px-8" onClick={publishBlog}>
 						Publish
 					</button>
 				</div>

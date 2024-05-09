@@ -25,7 +25,7 @@ const Tag = ({ tag, tagIndex }) => {
 		if (e.keyCode === 13 || e.keyCode === 188) {
 			e.preventDefault();
 
-			let currentTag = e.target.innerText;
+			const currentTag = e.target.innerText;
 
 			// Modify the value at tagIndex with the new value
 			tags[tagIndex] = currentTag;
