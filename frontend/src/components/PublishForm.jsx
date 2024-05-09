@@ -72,7 +72,7 @@ const PublishForm = () => {
 		}
 	};
 
-	const publishBlog = (e) => {
+	const publishBlog = async (e) => {
 		if (e.target.className.includes("disable")) {
 			return;
 		}
@@ -108,29 +108,32 @@ const PublishForm = () => {
 			draft: false,
 		};
 
-		axios
-			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`, blogObj, {
-				headers: {
-					Authorization: `Bearer ${access_token}`,
-				},
-			})
-			.then(() => {
-				e.target.classList.remove("disable");
+		try {
+			await axios.post(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
+				blogObj,
+				{
+					headers: {
+						Authorization: `Bearer ${access_token}`,
+					},
+				}
+			);
 
-				toast.dismiss(loadingToast);
-				toast.success("Published successfully!");
+			e.target.classList.remove("disable");
 
-				// TODO: Send user to dashboard (still need to create)
-				setTimeout(() => {
-					navigate("/");
-				}, 500);
-			})
-			.catch(({ response }) => {
-				e.target.classList.remove("disable");
+			toast.dismiss(loadingToast);
+			toast.success("Published successfully!");
 
-				toast.dismiss(loadingToast);
-				return toast.error(response.data.error);
-			});
+			// TODO: Send user to dashboard (still need to create)
+			setTimeout(() => {
+				navigate("/");
+			}, 500);
+		} catch ({ response }) {
+			e.target.classList.remove("disable");
+
+			toast.dismiss(loadingToast);
+			return toast.error(response.data.error);
+		}
 	};
 
 	return (
