@@ -16,13 +16,13 @@ const UserAuth = ({ type }) => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		let serverRoute = type === "sign-in" ? "/auth/signin" : "/auth/signup";
+		const serverRoute = type === "sign-in" ? "/auth/signin" : "/auth/signup";
 
-		let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-		let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+		const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 		// Use FormData to retrieve data from form
-		let form = new FormData(formElement);
+		const form = new FormData(formElement);
 		let formData = {};
 
 		for (let [key, value] of form.entries()) {
@@ -30,7 +30,7 @@ const UserAuth = ({ type }) => {
 		}
 
 		// Form validation
-		let { fullname, email, password } = formData;
+		const { fullname, email, password } = formData;
 
 		if (type === "sign-up" && fullname.length < 3) {
 			return toast.error("Full name must be at least 3 letters");
@@ -63,10 +63,7 @@ const UserAuth = ({ type }) => {
 		<AnimationWrapper keyValue={type}>
 			<section className="h-cover flex items-center justify-center">
 				<Toaster />
-				<form
-					id="formElement"
-					className="w-[80%] max-w-[400px]"
-				>
+				<form id="formElement" className="w-[80%] max-w-[400px]">
 					<h1 className="text-4xl font-gelasio capitalize text-center mb-24">
 						{type === "sign-in" ? "Welcome back!" : "Join us today!"}
 					</h1>

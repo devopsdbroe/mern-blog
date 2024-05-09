@@ -19,7 +19,7 @@ const uploadImageByFile = (e) => {
 };
 
 const uploadImageByUrl = (e) => {
-	let link = new Promise((resolve, reject) => {
+	const link = new Promise((resolve, reject) => {
 		try {
 			resolve(e);
 		} catch (err) {

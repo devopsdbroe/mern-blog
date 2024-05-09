@@ -31,7 +31,7 @@ const Home = () => {
 				page,
 			})
 			.then(async ({ data }) => {
-				let formattedData = await filterPaginationData({
+				const formattedData = await filterPaginationData({
 					state: blogs,
 					data: data.blogs,
 					page,
@@ -52,7 +52,7 @@ const Home = () => {
 				page,
 			})
 			.then(async ({ data }) => {
-				let formattedData = await filterPaginationData({
+				const formattedData = await filterPaginationData({
 					state: blogs,
 					data: data.blogs,
 					page,
