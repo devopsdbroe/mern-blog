@@ -110,12 +110,18 @@ export const getTrendingBlogs = (req, res) => {
 
 export const searchBlogs = (req, res) => {
 	// Filter according to tag
-	const { tag, page } = req.body;
+	const { tag, query, page } = req.body;
 
 	// Check if tags array contains the tag provided from req.body
-	const findQuery = { tags: tag, draft: false };
+	let findQuery;
 
-	const maxLimit = 1;
+	if (tag) {
+		findQuery = { tags: tag, draft: false };
+	} else if (query) {
+		findQuery = { draft: false, title: new RegExp(query, "i") };
+	}
+
+	const maxLimit = 10;
 
 	Blog.find(findQuery)
 		.populate(
@@ -135,9 +141,15 @@ export const searchBlogs = (req, res) => {
 };
 
 export const searchBlogsCount = (req, res) => {
-	const { tag } = req.body;
+	const { tag, query } = req.body;
 
-	const findQuery = { tags: tag, draft: false };
+	let findQuery;
+
+	if (tag) {
+		findQuery = { tags: tag, draft: false };
+	} else if (query) {
+		findQuery = { draft: false, title: new RegExp(query, "i") };
+	}
 
 	Blog.countDocuments(findQuery)
 		.then((count) => {
