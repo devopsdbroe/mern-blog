@@ -159,3 +159,22 @@ export const searchBlogsCount = (req, res) => {
 			return res.status(500).json({ error: err.message });
 		});
 };
+
+export const searchUsers = async (req, res) => {
+	const { query } = req.body;
+
+	try {
+		// Search for any users that contain the search query
+		const users = await User.find({
+			"personal_info.username": new RegExp(query, "i"),
+		})
+			.limit(50)
+			.select(
+				"personal_info.fullname personal_info.username personal_info.profile_img -_id"
+			);
+
+		return res.status(200).json({ users });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};

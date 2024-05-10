@@ -6,6 +6,7 @@ import {
 	getTrendingBlogs,
 	searchBlogs,
 	searchBlogsCount,
+	searchUsers,
 } from "../controllers/postController.js";
 import {
 	validateBlogData,
@@ -20,5 +21,6 @@ router.post("/getAllLatestBlogsCount", getAllLatestBlogsCount);
 router.get("/getTrendingBlogs", getTrendingBlogs);
 router.post("/searchBlogs", searchBlogs);
 router.post("/searchBlogsCount", searchBlogsCount);
+router.post("/searchUsers", searchUsers);
 
 export default router;
