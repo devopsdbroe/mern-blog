@@ -4,7 +4,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/Editor";
 import Tag from "./Tag";
 import axios from "axios";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
 const PublishForm = () => {

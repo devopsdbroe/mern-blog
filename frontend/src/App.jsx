@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import UserAuth from "./pages/UserAuth";
-import { UserProvider } from "./context/UserProvider";
+import { UserProvider } from "./context/UserContext";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import SearchPage from "./pages/SearchPage";

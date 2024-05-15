@@ -3,7 +3,7 @@ import AnimationWrapper from "../components/AnimationWrapper";
 import InputBox from "../components/InputBox";
 import { Toaster, toast } from "react-hot-toast";
 import { useContext } from "react";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import useAuth from "../hooks/useAuth";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 

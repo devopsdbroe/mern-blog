@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import UserNavigation from "./UserNavigation";
 
 const Navbar = () => {

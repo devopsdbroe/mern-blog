@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import toast from "react-hot-toast";
 import { storeInSession } from "../services/session";
 

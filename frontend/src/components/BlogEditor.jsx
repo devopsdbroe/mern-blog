@@ -9,7 +9,7 @@ import { EditorContext } from "../pages/Editor";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
 import axios from "axios";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 
 const BlogEditor = () => {
 	const {
