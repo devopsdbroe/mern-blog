@@ -10,30 +10,29 @@ import InlineCode from "@editorjs/inline-code";
 
 import { uploadImage } from "../services/aws";
 
-const uploadImageByFile = (e) => {
-	return uploadImage(e).then((url) => {
+const uploadImageByFile = async (e) => {
+	try {
+		const url = await uploadImage(e);
+
 		if (url) {
 			return { success: 1, file: { url } };
 		}
-	});
+	} catch (error) {
+		console.log(error);
+	}
 };
 
-const uploadImageByUrl = (e) => {
-	let link = new Promise((resolve, reject) => {
-		try {
-			resolve(e);
-		} catch (err) {
-			console.log("There was an issue with upload");
-			reject(err);
-		}
-	});
+const uploadImageByUrl = async (e) => {
+	try {
+		const url = e;
 
-	return link.then((url) => {
 		return {
 			success: 1,
 			file: { url },
 		};
-	});
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const tools = {

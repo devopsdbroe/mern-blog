@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-let profile_imgs_name_list = [
+const profile_imgs_name_list = [
 	"Garfield",
 	"Tinkerbell",
 	"Annie",
@@ -22,7 +22,8 @@ let profile_imgs_name_list = [
 	"Felix",
 	"Kiki",
 ];
-let profile_imgs_collections_list = [
+
+const profile_imgs_collections_list = [
 	"notionists-neutral",
 	"adventurer-neutral",
 	"fun-emoji",

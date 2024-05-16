@@ -1,11 +1,10 @@
 import User from "../models/user.js";
 import Blog from "../models/blog.js";
 import { generateBlogId } from "../utils/postHelpers.js";
-import { raw } from "express";
 
 export const createBlog = async (req, res) => {
 	// req.user was set to user.id in validateJWT
-	let authorId = req.user;
+	const authorId = req.user;
 
 	let {
 		title,
@@ -22,9 +21,9 @@ export const createBlog = async (req, res) => {
 	// Replace any special characters with whitespace
 	// Replace any whitespace with dashes
 	// Trim whitespace and add nanoId
-	let blog_id = generateBlogId(title);
+	const blog_id = generateBlogId(title);
 
-	let blog = new Blog({
+	const blog = new Blog({
 		blog_id,
 		title,
 		banner,
@@ -38,7 +37,7 @@ export const createBlog = async (req, res) => {
 	try {
 		// Save blog post to DB
 		await blog.save();
-		let incrementVal = draft ? 0 : 1;
+		const incrementVal = draft ? 0 : 1;
 
 		// Update user
 		await User.findOneAndUpdate(
@@ -54,61 +53,60 @@ export const createBlog = async (req, res) => {
 	}
 };
 
-export const getLatestBlogs = (req, res) => {
+export const getLatestBlogs = async (req, res) => {
 	const { page } = req.body;
 
 	const maxLimit = 5;
 
-	Blog.find({ draft: false })
-		.populate(
-			"author",
-			"personal_info.fullname personal_info.username personal_info.profile_img -_id"
-		)
-		.sort({ publishedAt: -1 })
-		.select("blog_id title description banner activity tags publishedAt -_id")
-		.skip((page - 1) * maxLimit)
-		.limit(maxLimit)
-		.then((blogs) => {
-			return res.status(200).json({ blogs });
-		})
-		.catch((err) => {
-			return res.status(500).json({ error: err.message });
-		});
+	try {
+		const blogs = await Blog.find({ draft: false })
+			.populate(
+				"author",
+				"personal_info.fullname personal_info.username personal_info.profile_img -_id"
+			)
+			.sort({ publishedAt: -1 })
+			.select("blog_id title description banner activity tags publishedAt -_id")
+			.skip((page - 1) * maxLimit)
+			.limit(maxLimit);
+
+		return res.status(200).json({ blogs });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
 };
 
-export const getAllLatestBlogsCount = (req, res) => {
-	Blog.countDocuments({ draft: false })
-		.then((count) => {
-			return res.status(200).json({ totalDocs: count });
-		})
-		.catch((err) => {
-			console.log(err.message);
-			return res.status(500).json({ error: err.message });
-		});
+export const getAllLatestBlogsCount = async (req, res) => {
+	try {
+		const count = await Blog.countDocuments({ draft: false });
+		return res.status(200).json({ totalDocs: count });
+	} catch (error) {
+		console.log(error.message);
+		return res.status(500).json({ error: error.message });
+	}
 };
 
-export const getTrendingBlogs = (req, res) => {
-	Blog.find({ draft: false })
-		.populate(
-			"author",
-			"personal_info.fullname personal_info.username personal_info.profile_img -_id"
-		)
-		.sort({
-			"activity.total_reads": -1,
-			"activity.total_likes": -1,
-			publishedAt: -1,
-		})
-		.select("blog_id title publishedAt -_id")
-		.limit(5)
-		.then((blogs) => {
-			return res.status(200).json({ blogs });
-		})
-		.catch((err) => {
-			return res.status(500).json({ error: err.message });
-		});
+export const getTrendingBlogs = async (req, res) => {
+	try {
+		const blogs = await Blog.find({ draft: false })
+			.populate(
+				"author",
+				"personal_info.fullname personal_info.username personal_info.profile_img -_id"
+			)
+			.sort({
+				"activity.total_reads": -1,
+				"activity.total_likes": -1,
+				publishedAt: -1,
+			})
+			.select("blog_id title publishedAt -_id")
+			.limit(5);
+
+		return res.status(200).json({ blogs });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
 };
 
-export const searchBlogs = (req, res) => {
+export const searchBlogs = async (req, res) => {
 	// Filter according to tag
 	const { tag, query, page } = req.body;
 
@@ -123,24 +121,24 @@ export const searchBlogs = (req, res) => {
 
 	const maxLimit = 10;
 
-	Blog.find(findQuery)
-		.populate(
-			"author",
-			"personal_info.fullname personal_info.username personal_info.profile_img -_id"
-		)
-		.sort({ publishedAt: -1 })
-		.select("blog_id title description banner activity tags publishedAt -_id")
-		.skip((page - 1) * maxLimit)
-		.limit(maxLimit)
-		.then((blogs) => {
-			return res.status(200).json({ blogs });
-		})
-		.catch((err) => {
-			return res.status(500).json({ error: err.message });
-		});
+	try {
+		const blogs = await Blog.find(findQuery)
+			.populate(
+				"author",
+				"personal_info.fullname personal_info.username personal_info.profile_img -_id"
+			)
+			.sort({ publishedAt: -1 })
+			.select("blog_id title description banner activity tags publishedAt -_id")
+			.skip((page - 1) * maxLimit)
+			.limit(maxLimit);
+
+		return res.status(200).json({ blogs });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
 };
 
-export const searchBlogsCount = (req, res) => {
+export const searchBlogsCount = async (req, res) => {
 	const { tag, query } = req.body;
 
 	let findQuery;
@@ -151,13 +149,13 @@ export const searchBlogsCount = (req, res) => {
 		findQuery = { draft: false, title: new RegExp(query, "i") };
 	}
 
-	Blog.countDocuments(findQuery)
-		.then((count) => {
-			return res.status(200).json({ totalDocs: count });
-		})
-		.catch((err) => {
-			return res.status(500).json({ error: err.message });
-		});
+	try {
+		const count = await Blog.countDocuments(findQuery);
+
+		return res.status(200).json({ totalDocs: count });
+	} catch (error) {
+		return res.status(500).json({ error: err.message });
+	}
 };
 
 export const searchUsers = async (req, res) => {

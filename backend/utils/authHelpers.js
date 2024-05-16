@@ -20,7 +20,7 @@ export const generateUsername = async (email) => {
 	let username = email.split("@")[0];
 
 	// Check MongoDB to see if username already exists
-	let usernameExists = await User.exists({
+	const usernameExists = await User.exists({
 		"personal_info.username": username,
 	});
 

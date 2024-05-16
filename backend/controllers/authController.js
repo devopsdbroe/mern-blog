@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
 		const username = await generateUsername(email);
 
 		// Create new user via User model
-		let user = new User({
+		const user = new User({
 			personal_info: {
 				fullname,
 				email,
@@ -71,7 +71,7 @@ export const signin = async (req, res) => {
 };
 
 export const google = async (req, res) => {
-	let { access_token } = req.body;
+	const { access_token } = req.body;
 
 	try {
 		// Confirm with Google that access token is valid
@@ -96,7 +96,7 @@ export const google = async (req, res) => {
 			}
 		} else {
 			// Gernerate username if user doesn't exist already
-			let username = await generateUsername(email);
+			const username = await generateUsername(email);
 			user = new User({
 				personal_info: {
 					fullname: name,

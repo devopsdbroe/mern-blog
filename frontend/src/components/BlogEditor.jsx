@@ -38,30 +38,29 @@ const BlogEditor = () => {
 		);
 	}, []);
 
-	const handleBannerUpload = (e) => {
+	const handleBannerUpload = async (e) => {
 		const img = e.target.files[0];
 
 		if (img) {
-			let loadingToast = toast.loading("Uploading...");
+			const loadingToast = toast.loading("Uploading...");
 
-			uploadImage(img)
-				.then((url) => {
-					if (url) {
-						toast.dismiss(loadingToast);
-						toast.success("Upload Successful");
+			try {
+				const url = await uploadImage(img);
 
-						setBlog({ ...blog, banner: url });
-					}
-				})
-				.catch((err) => {
+				if (url) {
 					toast.dismiss(loadingToast);
-					return toast.error(err);
-				});
+					toast.success("Upload Successful");
+					setBlog({ ...blog, banner: url });
+				}
+			} catch (error) {
+				toast.dismiss(loadingToast);
+				return toast.error(error);
+			}
 		}
 	};
 
 	const handleError = (e) => {
-		let img = e.target;
+		const img = e.target;
 
 		img.src = defaultBanner;
 	};
@@ -76,7 +75,7 @@ const BlogEditor = () => {
 
 	const handleTitleChange = (e) => {
 		// Store reference to textarea
-		let input = e.target;
+		const input = e.target;
 
 		input.style.height = "auto";
 		input.style.height = input.scrollHeight + "px";
@@ -84,7 +83,7 @@ const BlogEditor = () => {
 		setBlog({ ...blog, title: input.value });
 	};
 
-	const handlePublishEvent = () => {
+	const handlePublishEvent = async () => {
 		// Validate form data
 		if (!banner.length) {
 			return toast.error("Please upload a blog banner image");
@@ -95,25 +94,23 @@ const BlogEditor = () => {
 		}
 
 		if (textEditor.isReady) {
-			// Convert data from editor into an array
-			textEditor
-				.save()
-				.then((data) => {
-					// Check if there is data in array and add to blog state
-					if (data.blocks.length) {
-						setBlog({ ...blog, content: data });
-						setEditorState("publish");
-					} else {
-						return toast.error("Please add content to your blog");
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-				});
+			try {
+				const data = await textEditor.save();
+
+				// Check if there is data in array and add to blog state
+				if (data.blocks.length) {
+					setBlog({ ...blog, content: data });
+					setEditorState("publish");
+				} else {
+					return toast.error("Please add content to your blog");
+				}
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	};
 
-	const handleSaveDraft = (e) => {
+	const handleSaveDraft = async (e) => {
 		if (e.target.className.includes("disable")) {
 			return;
 		}
@@ -124,13 +121,15 @@ const BlogEditor = () => {
 		}
 
 		// Send data to backend
-		let loadingToast = toast.loading("Saving Draft...");
+		const loadingToast = toast.loading("Saving Draft...");
 
 		e.target.classList.add("disable");
 
 		if (textEditor.isReady) {
-			textEditor.save().then((content) => {
-				let blogObj = {
+			try {
+				const content = await textEditor.save();
+
+				const blogObj = {
 					title,
 					banner,
 					description,
@@ -139,34 +138,31 @@ const BlogEditor = () => {
 					draft: true,
 				};
 
-				axios
-					.post(
-						`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
-						blogObj,
-						{
-							headers: {
-								Authorization: `Bearer ${access_token}`,
-							},
-						}
-					)
-					.then(() => {
-						e.target.classList.remove("disable");
+				await axios.post(
+					`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
+					blogObj,
+					{
+						headers: {
+							Authorization: `Bearer ${access_token}`,
+						},
+					}
+				);
 
-						toast.dismiss(loadingToast);
-						toast.success("Saved successfully!");
+				e.target.classList.remove("disable");
 
-						// TODO: Send user to dashboard (still need to create)
-						setTimeout(() => {
-							navigate("/");
-						}, 500);
-					})
-					.catch(({ response }) => {
-						e.target.classList.remove("disable");
+				toast.dismiss(loadingToast);
+				toast.success("Saved successfully!");
 
-						toast.dismiss(loadingToast);
-						return toast.error(response.data.error);
-					});
-			});
+				// TODO: Send user to dashboard (still need to create)
+				setTimeout(() => {
+					navigate("/");
+				}, 500);
+			} catch ({ response }) {
+				e.target.classList.remove("disable");
+
+				toast.dismiss(loadingToast);
+				return toast.error(response.data.error);
+			}
 		}
 	};
 
@@ -174,27 +170,17 @@ const BlogEditor = () => {
 		<>
 			<nav className="navbar">
 				<Link to="/">
-					<img
-						src={Logo}
-						alt="logo"
-						className="flex-none w-10"
-					/>
+					<img src={Logo} alt="logo" className="flex-none w-10" />
 				</Link>
 				<p className="max-md:hidden text-black line-clamp-1 w-full">
 					{title.length ? title : "New Blog"}
 				</p>
 
 				<div className="flex gap-4 ml-auto">
-					<button
-						className="btn-dark py-2"
-						onClick={handlePublishEvent}
-					>
+					<button className="btn-dark py-2" onClick={handlePublishEvent}>
 						Publish
 					</button>
-					<button
-						className="btn-light py-2"
-						onClick={handleSaveDraft}
-					>
+					<button className="btn-light py-2" onClick={handleSaveDraft}>
 						Save Draft
 					</button>
 				</div>
@@ -231,10 +217,7 @@ const BlogEditor = () => {
 
 						<hr className="w-full opacity-10 my-5" />
 
-						<div
-							id="textEditor"
-							className="font-gelasio"
-						></div>
+						<div id="textEditor" className="font-gelasio"></div>
 					</div>
 				</section>
 			</AnimationWrapper>
