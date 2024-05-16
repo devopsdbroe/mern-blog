@@ -4,7 +4,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "../pages/Editor";
 import Tag from "./Tag";
 import axios from "axios";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
 const PublishForm = () => {
@@ -152,7 +152,10 @@ const PublishForm = () => {
 					<p className="text-dark-grey mb-1">Preview</p>
 
 					<div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
-						<img src={banner} alt="banner image" />
+						<img
+							src={banner}
+							alt="banner image"
+						/>
 					</div>
 
 					<h1 className="text-4xl font-medium mt-2 leading-tight line-clamp-2">
@@ -199,7 +202,11 @@ const PublishForm = () => {
 						/>
 
 						{tags.map((tag, i) => (
-							<Tag key={i} tagIndex={i} tag={tag} />
+							<Tag
+								key={i}
+								tagIndex={i}
+								tag={tag}
+							/>
 						))}
 					</div>
 
@@ -207,7 +214,10 @@ const PublishForm = () => {
 						{tagLimit - tags.length} tags left
 					</p>
 
-					<button className="btn-dark px-8" onClick={publishBlog}>
+					<button
+						className="btn-dark px-8"
+						onClick={publishBlog}
+					>
 						Publish
 					</button>
 				</div>

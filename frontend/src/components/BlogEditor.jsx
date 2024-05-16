@@ -9,7 +9,7 @@ import { EditorContext } from "../pages/Editor";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
 import axios from "axios";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 
 const BlogEditor = () => {
 	const {
@@ -170,17 +170,27 @@ const BlogEditor = () => {
 		<>
 			<nav className="navbar">
 				<Link to="/">
-					<img src={Logo} alt="logo" className="flex-none w-10" />
+					<img
+						src={Logo}
+						alt="logo"
+						className="flex-none w-10"
+					/>
 				</Link>
 				<p className="max-md:hidden text-black line-clamp-1 w-full">
 					{title.length ? title : "New Blog"}
 				</p>
 
 				<div className="flex gap-4 ml-auto">
-					<button className="btn-dark py-2" onClick={handlePublishEvent}>
+					<button
+						className="btn-dark py-2"
+						onClick={handlePublishEvent}
+					>
 						Publish
 					</button>
-					<button className="btn-light py-2" onClick={handleSaveDraft}>
+					<button
+						className="btn-light py-2"
+						onClick={handleSaveDraft}
+					>
 						Save Draft
 					</button>
 				</div>
@@ -217,7 +227,10 @@ const BlogEditor = () => {
 
 						<hr className="w-full opacity-10 my-5" />
 
-						<div id="textEditor" className="font-gelasio"></div>
+						<div
+							id="textEditor"
+							className="font-gelasio"
+						></div>
 					</div>
 				</section>
 			</AnimationWrapper>

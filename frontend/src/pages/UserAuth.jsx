@@ -3,7 +3,7 @@ import AnimationWrapper from "../components/AnimationWrapper";
 import InputBox from "../components/InputBox";
 import { Toaster, toast } from "react-hot-toast";
 import { useContext } from "react";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import useAuth from "../hooks/useAuth";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 
@@ -63,7 +63,10 @@ const UserAuth = ({ type }) => {
 		<AnimationWrapper keyValue={type}>
 			<section className="h-cover flex items-center justify-center">
 				<Toaster />
-				<form id="formElement" className="w-[80%] max-w-[400px]">
+				<form
+					id="formElement"
+					className="w-[80%] max-w-[400px]"
+				>
 					<h1 className="text-4xl font-gelasio capitalize text-center mb-24">
 						{type === "sign-in" ? "Welcome back!" : "Join us today!"}
 					</h1>

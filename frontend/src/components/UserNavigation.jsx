@@ -1,7 +1,7 @@
 import AnimationWrapper from "./AnimationWrapper";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import { removeFromSession } from "../services/session";
 
 const UserNavigation = () => {

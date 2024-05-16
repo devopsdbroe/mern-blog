@@ -1,6 +1,6 @@
 import { useContext, createContext } from "react";
 import { Navigate } from "react-router-dom";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "../context/UserContext";
 import BlogEditor from "../components/BlogEditor";
 import PublishForm from "../components/PublishForm";
 import { EditorProvider } from "../context/EditorContext";
