@@ -5,6 +5,7 @@ import { UserProvider } from "./context/UserContext";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import SearchPage from "./pages/SearchPage";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
 	return (
@@ -33,6 +34,10 @@ function App() {
 					<Route
 						path="search/:query"
 						element={<SearchPage />}
+					/>
+					<Route
+						path="*"
+						element={<PageNotFound />}
 					/>
 				</Route>
 			</Routes>
