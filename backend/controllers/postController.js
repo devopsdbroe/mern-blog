@@ -176,3 +176,19 @@ export const searchUsers = async (req, res) => {
 		return res.status(500).json({ error: error.message });
 	}
 };
+
+export const getProfile = async (req, res) => {
+	// Retreive username to get data from MongoDB
+	const { username } = req.body;
+
+	try {
+		const user = await User.findOne({
+			"personal_info.username": username,
+		}).select("-personal_info.password -google_auth -updatedAt -blogs");
+
+		return res.status(200).json(user);
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+};

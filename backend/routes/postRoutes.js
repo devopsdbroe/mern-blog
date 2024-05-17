@@ -3,6 +3,7 @@ import {
 	createBlog,
 	getAllLatestBlogsCount,
 	getLatestBlogs,
+	getProfile,
 	getTrendingBlogs,
 	searchBlogs,
 	searchBlogsCount,
@@ -22,5 +23,6 @@ router.get("/getTrendingBlogs", getTrendingBlogs);
 router.post("/searchBlogs", searchBlogs);
 router.post("/searchBlogsCount", searchBlogsCount);
 router.post("/searchUsers", searchUsers);
+router.post("/getProfile", getProfile);
 
 export default router;
