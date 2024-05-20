@@ -7,43 +7,21 @@ import Home from "./pages/Home";
 import SearchPage from "./pages/SearchPage";
 import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/ProfilePage";
+import BlogPage from "./pages/BlogPage";
 
 function App() {
 	return (
 		<UserProvider>
 			<Routes>
-				<Route
-					path="/editor"
-					element={<Editor />}
-				/>
-				<Route
-					path="/"
-					element={<Navbar />}
-				>
-					<Route
-						index
-						element={<Home />}
-					/>
-					<Route
-						path="signin"
-						element={<UserAuth type="sign-in" />}
-					/>
-					<Route
-						path="signup"
-						element={<UserAuth type="sign-up" />}
-					/>
-					<Route
-						path="search/:query"
-						element={<SearchPage />}
-					/>
-					<Route
-						path="user/:id"
-						element={<ProfilePage />}
-					/>
-					<Route
-						path="*"
-						element={<PageNotFound />}
-					/>
+				<Route path="/editor" element={<Editor />} />
+				<Route path="/" element={<Navbar />}>
+					<Route index element={<Home />} />
+					<Route path="signin" element={<UserAuth type="sign-in" />} />
+					<Route path="signup" element={<UserAuth type="sign-up" />} />
+					<Route path="search/:query" element={<SearchPage />} />
+					<Route path="user/:id" element={<ProfilePage />} />
+					<Route path="blog/:blog_id" element={<BlogPage />} />
+					<Route path="*" element={<PageNotFound />} />
 				</Route>
 			</Routes>
 		</UserProvider>
