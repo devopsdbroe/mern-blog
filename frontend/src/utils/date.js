@@ -26,7 +26,7 @@ const days = [
 export const getDay = (timeStamp) => {
 	const date = new Date(timeStamp);
 
-	return `${date.getDate()} ${months[date.getMonth()]}`;
+	return `${months[date.getMonth()]} ${date.getDate()}th`;
 };
 
 export const getFullDay = (timeStamp) => {
