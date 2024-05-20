@@ -29,7 +29,7 @@ const PageNotFound = () => {
 					className="h-8 object-contain block mx-auto select-none"
 				/>
 				<p className="mt-5 text-dark-grey">
-					Read millions of stories around the world
+					Read millions of stories from around the world
 				</p>
 			</div>
 		</section>

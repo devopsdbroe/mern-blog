@@ -108,7 +108,7 @@ export const getTrendingBlogs = async (req, res) => {
 
 export const searchBlogs = async (req, res) => {
 	// Filter according to tag
-	const { tag, query, page } = req.body;
+	const { tag, query, author, page } = req.body;
 
 	// Check if tags array contains the tag provided from req.body
 	let findQuery;
@@ -117,6 +117,8 @@ export const searchBlogs = async (req, res) => {
 		findQuery = { tags: tag, draft: false };
 	} else if (query) {
 		findQuery = { draft: false, title: new RegExp(query, "i") };
+	} else if (author) {
+		findQuery = { author, draft: false };
 	}
 
 	const maxLimit = 10;
@@ -139,7 +141,7 @@ export const searchBlogs = async (req, res) => {
 };
 
 export const searchBlogsCount = async (req, res) => {
-	const { tag, query } = req.body;
+	const { tag, query, author } = req.body;
 
 	let findQuery;
 
@@ -147,6 +149,8 @@ export const searchBlogsCount = async (req, res) => {
 		findQuery = { tags: tag, draft: false };
 	} else if (query) {
 		findQuery = { draft: false, title: new RegExp(query, "i") };
+	} else if (author) {
+		findQuery = { author, draft: false };
 	}
 
 	try {
