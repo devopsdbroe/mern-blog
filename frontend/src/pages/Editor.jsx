@@ -1,12 +1,10 @@
-import { useContext, createContext } from "react";
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import BlogEditor from "../components/BlogEditor";
 import PublishForm from "../components/PublishForm";
 import { EditorProvider } from "../context/EditorContext";
 import useEditor from "../hooks/useEditor";
-
-export const EditorContext = createContext({});
 
 const Editor = () => {
 	const {

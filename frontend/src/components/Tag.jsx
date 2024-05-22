@@ -1,12 +1,11 @@
-import { useContext } from "react";
-import { EditorContext } from "../pages/Editor";
+import useEditor from "../hooks/useEditor";
 
 const Tag = ({ tag, tagIndex }) => {
 	let {
 		blog,
 		blog: { tags },
 		setBlog,
-	} = useContext(EditorContext);
+	} = useEditor();
 
 	const addEditable = (e) => {
 		e.target.setAttribute("contentEditable", true);

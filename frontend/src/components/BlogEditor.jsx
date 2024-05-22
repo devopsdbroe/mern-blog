@@ -5,11 +5,11 @@ import defaultBanner from "../assets/blog banner.png";
 import AnimationWrapper from "./AnimationWrapper";
 import { uploadImage } from "../services/aws";
 import { Toaster, toast } from "react-hot-toast";
-import { EditorContext } from "../pages/Editor";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
+import useEditor from "../hooks/useEditor";
 
 const BlogEditor = () => {
 	const {
@@ -19,7 +19,7 @@ const BlogEditor = () => {
 		setEditorState,
 		textEditor,
 		setTextEditor,
-	} = useContext(EditorContext);
+	} = useEditor();
 
 	const {
 		userAuth: { access_token },

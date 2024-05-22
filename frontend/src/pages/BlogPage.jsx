@@ -5,12 +5,12 @@ import AnimationWrapper from "../components/AnimationWrapper";
 import Loader from "../components/Loader";
 import BlogInteraction from "../components/BlogInteraction";
 import { getDay } from "../utils/date";
+import BlogCard from "../components/BlogCard";
 
 export const blogStructure = {
 	title: "",
 	description: "",
 	content: [],
-	tags: [],
 	author: { personal_info: {} },
 	banner: "",
 	publishedAt: "",
@@ -22,6 +22,7 @@ const BlogPage = () => {
 	const { blog_id } = useParams();
 
 	const [blog, setBlog] = useState(blogStructure);
+	const [similarBlogs, setSimilarBlogs] = useState(null);
 	const [loading, setLoading] = useState(true);
 
 	const {
@@ -36,16 +37,30 @@ const BlogPage = () => {
 
 	const fetchBlog = async () => {
 		try {
-			const {
-				data: { blog },
-			} = await axios.post(
+			const blogResponse = await axios.post(
 				`${import.meta.env.VITE_SERVER_DOMAIN}/post/getBlogs`,
 				{
 					blog_id,
 				}
 			);
 
+			const blog = blogResponse.data.blog;
+
 			setBlog(blog);
+
+			const searchResponse = await axios.post(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/searchBlogs`,
+				{
+					tag: blog.tags[0],
+					limit: 6,
+					eliminate_blog: blog_id,
+				}
+			);
+
+			const relatedBlogs = searchResponse.data.blogs;
+
+			setSimilarBlogs(relatedBlogs);
+
 			setLoading(false);
 		} catch (error) {
 			console.log(error);
@@ -53,7 +68,15 @@ const BlogPage = () => {
 		}
 	};
 
+	const resetStates = () => {
+		setBlog(blogStructure);
+		setSimilarBlogs(null);
+		setLoading(true);
+	};
+
 	useEffect(() => {
+		resetStates();
+
 		fetchBlog();
 	}, [blog_id]);
 
@@ -100,6 +123,36 @@ const BlogPage = () => {
 						</div>
 
 						<BlogInteraction />
+
+						{/* Blog content to go here */}
+
+						<BlogInteraction />
+
+						{similarBlogs !== null && similarBlogs.length > 0 && (
+							<>
+								<h1 className="text-2xl mt-14 mb-10 font-medium">
+									Similar Blogs
+								</h1>
+
+								{similarBlogs.map((blog, i) => {
+									const {
+										author: { personal_info },
+									} = blog;
+
+									return (
+										<AnimationWrapper
+											key={i}
+											transition={{ duration: 1, delay: i * 0.08 }}
+										>
+											<BlogCard
+												content={blog}
+												author={personal_info}
+											/>
+										</AnimationWrapper>
+									);
+								})}
+							</>
+						)}
 					</div>
 				</BlogContext.Provider>
 			)}

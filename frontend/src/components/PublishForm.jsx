@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import AnimationWrapper from "./AnimationWrapper";
 import { Toaster, toast } from "react-hot-toast";
-import { EditorContext } from "../pages/Editor";
 import Tag from "./Tag";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import useEditor from "../hooks/useEditor";
 
 const PublishForm = () => {
 	const characterLimit = 200;
@@ -16,7 +16,7 @@ const PublishForm = () => {
 		blog: { banner, title, content, tags, description },
 		setBlog,
 		setEditorState,
-	} = useContext(EditorContext);
+	} = useEditor();
 
 	const {
 		userAuth: { access_token },

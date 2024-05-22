@@ -12,7 +12,7 @@ const blogStructure = {
 	},
 };
 
-export const EditorContext = createContext({});
+export const EditorContext = createContext();
 
 export const EditorProvider = ({ children }) => {
 	const [editorState, setEditorState] = useState("editor");
