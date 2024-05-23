@@ -115,8 +115,6 @@ const Home = () => {
 		setPageState(category);
 	};
 
-	console.log(trendingBlogs);
-
 	return (
 		<AnimationWrapper>
 			<section className="h-cover flex justify-center gap-10">
@@ -160,7 +158,10 @@ const Home = () => {
 									key={i}
 									transition={{ duration: 1, delay: i * 0.1 }}
 								>
-									<MinimalBlogCard blog={blog} index={i} />
+									<MinimalBlogCard
+										blog={blog}
+										index={i}
+									/>
 								</AnimationWrapper>
 							))
 						) : (
@@ -205,7 +206,10 @@ const Home = () => {
 										key={i}
 										transition={{ duration: 1, delay: i * 0.1 }}
 									>
-										<MinimalBlogCard blog={blog} index={i} />
+										<MinimalBlogCard
+											blog={blog}
+											index={i}
+										/>
 									</AnimationWrapper>
 								))
 							) : (

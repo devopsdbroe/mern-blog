@@ -28,14 +28,23 @@ const BlogEditor = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		setTextEditor(
-			new EditorJS({
-				holder: "textEditor",
-				data: content,
-				tools: tools,
-				placeholder: "Let's write an awesome story!",
-			})
-		);
+		const editor = new EditorJS({
+			holder: "textEditor",
+			data: content || { blocks: [] },
+			tools: tools,
+			placeholder: "Let's write an awesome story!",
+		});
+
+		setTextEditor(editor);
+
+		// Clean up editor instance on unmount
+		return () => {
+			editor.isReady
+				.then(() => {
+					editor.destroy();
+				})
+				.catch((e) => console.error("Error while destroying editor", e));
+		};
 	}, []);
 
 	const handleBannerUpload = async (e) => {
