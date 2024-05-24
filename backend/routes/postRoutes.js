@@ -6,6 +6,8 @@ import {
 	getLatestBlogs,
 	getProfile,
 	getTrendingBlogs,
+	isLikedByUser,
+	likeBlog,
 	searchBlogs,
 	searchBlogsCount,
 	searchUsers,
@@ -26,5 +28,7 @@ router.post("/searchBlogsCount", searchBlogsCount);
 router.post("/searchUsers", searchUsers);
 router.post("/getProfile", getProfile);
 router.post("/getBlogs", getBlogs);
+router.post("/likeBlog", validateJWT, likeBlog);
+router.post("/isLikedByUser", validateJWT, isLikedByUser);
 
 export default router;

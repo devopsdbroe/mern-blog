@@ -1,11 +1,15 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BlogContext } from "../pages/BlogPage";
 import { UserContext } from "../context/UserContext";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "axios";
 
 const BlogInteraction = () => {
-	const {
+	let {
+		blog,
 		blog: {
+			_id,
 			title,
 			blog_id,
 			activity,
@@ -15,20 +19,92 @@ const BlogInteraction = () => {
 			},
 		},
 		setBlog,
+		isLikedByUser,
+		setIsLikedByUser,
 	} = useContext(BlogContext);
 
 	const {
-		userAuth: { username },
+		userAuth: { username, access_token },
 	} = useContext(UserContext);
+
+	const handleLike = async () => {
+		// Check if user is logged in
+		if (access_token) {
+			try {
+				// Toggle whether preVal is true or false
+				setIsLikedByUser((preVal) => !preVal);
+
+				// Increment by 1 if isLikedByUser is true
+				// Decrement by 1 is false
+				!isLikedByUser ? total_likes++ : total_likes--;
+
+				setBlog({ ...blog, activity: { ...activity, total_likes } });
+
+				const data = await axios.post(
+					`${import.meta.env.VITE_SERVER_DOMAIN}/post/likeBlog`,
+					{
+						_id,
+						isLikedByUser,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${access_token}`,
+						},
+					}
+				);
+			} catch (error) {
+				console.log("Error liking this blog:", error);
+				toast.error(
+					"An error occured while liking this blog post. Please try again."
+				);
+			}
+		} else {
+			toast.error("Please login to like this blog post");
+		}
+	};
+
+	const fetchLikes = async () => {
+		try {
+			// If user is logged in
+			if (access_token) {
+				// Make request to server to get like information
+				const { data } = await axios.post(
+					`${import.meta.env.VITE_SERVER_DOMAIN}/post/isLikedByUser`,
+					{
+						_id,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${access_token}`,
+						},
+					}
+				);
+
+				setIsLikedByUser(Boolean(data.result));
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchLikes();
+	}, []);
 
 	return (
 		<>
+			<Toaster />
 			<hr className="border-grey my-2" />
 
 			<div className="flex gap-6 justify-between">
 				<div className="flex gap-3 items-center">
-					<button className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80">
-						<i className="fi fi-rr-heart"></i>
+					<button
+						className={`w-10 h-10 rounded-full flex items-center justify-center ${
+							isLikedByUser ? "bg-red/20 text-red" : "bg-grey/80"
+						}`}
+						onClick={handleLike}
+					>
+						<i className={`fi fi-${isLikedByUser ? "sr" : "rr"}-heart`}></i>
 					</button>
 					<p className="text-xl text-dark-grey">{total_likes}</p>
 

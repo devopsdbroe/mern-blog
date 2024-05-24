@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import Blog from "../models/blog.js";
+import Notification from "../models/notification.js";
 import { generateBlogId } from "../utils/postHelpers.js";
 
 export const createBlog = async (req, res) => {
@@ -246,6 +247,79 @@ export const getBlogs = async (req, res) => {
 		}
 
 		return res.status(200).json({ blog });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const likeBlog = async (req, res) => {
+	// Get user ID from validateJWT
+	const user_id = req.user;
+
+	const { _id, isLikedByUser } = req.body;
+
+	if (!_id || typeof isLikedByUser !== "boolean") {
+		return res.status(400).json({ error: "Invalid request data" });
+	}
+
+	const incrementVal = !isLikedByUser ? 1 : -1;
+
+	try {
+		// Find blog and update the like count
+		const blog = await Blog.findOneAndUpdate(
+			{ _id },
+			{ $inc: { "activity.total_likes": incrementVal } },
+			{ new: true }
+		);
+
+		if (!blog) {
+			return res.status(404).json({ error: "Blog not found" });
+		}
+
+		// If blog was liked, create a new notification
+		if (!isLikedByUser) {
+			const like = new Notification({
+				type: "like",
+				blog: _id,
+				notification_for: blog.author,
+				user: user_id,
+			});
+
+			await like.save();
+
+			return res.status(200).json({ liked_by_user: true });
+		} else {
+			const result = await Notification.findOneAndDelete({
+				user: user_id,
+				blog: _id,
+				type: "like",
+			});
+
+			if (!result) {
+				return res.status(500).json({ error: "Failed to unlike the blog" });
+			}
+
+			// Return response for unliking the blog
+			return res.status(200).json({ liked_by_user: false });
+		}
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const isLikedByUser = async (req, res) => {
+	const user_id = req.user;
+
+	const { _id } = req.body;
+
+	try {
+		const result = await Notification.exists({
+			user: user_id,
+			type: "like",
+			blog: _id,
+		});
+
+		return res.status(200).json({ result });
 	} catch (error) {
 		return res.status(500).json({ error: error.message });
 	}
