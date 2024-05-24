@@ -13,6 +13,7 @@ export const createBlog = async (req, res) => {
 		description,
 		tags,
 		draft = undefined,
+		id,
 	} = req.body;
 
 	// Convert tags to lowercase
@@ -21,35 +22,55 @@ export const createBlog = async (req, res) => {
 	// Replace any special characters with whitespace
 	// Replace any whitespace with dashes
 	// Trim whitespace and add nanoId
-	const blog_id = generateBlogId(title);
+	const blog_id = id || generateBlogId(title);
 
-	const blog = new Blog({
-		blog_id,
-		title,
-		banner,
-		description,
-		content,
-		tags,
-		author: authorId,
-		draft: Boolean(draft),
-	});
+	if (id) {
+		try {
+			await Blog.findOneAndUpdate(
+				{ blog_id },
+				{
+					title,
+					description,
+					banner,
+					content,
+					tags,
+					draft: draft ? draft : false,
+				}
+			);
 
-	try {
-		// Save blog post to DB
-		await blog.save();
-		const incrementVal = draft ? 0 : 1;
+			return res.status(200).json({ id: blog_id });
+		} catch (error) {
+			return res.status(500).json({ error: error.message });
+		}
+	} else {
+		const blog = new Blog({
+			blog_id,
+			title,
+			banner,
+			description,
+			content,
+			tags,
+			author: authorId,
+			draft: Boolean(draft),
+		});
 
-		// Update user
-		await User.findOneAndUpdate(
-			{ _id: authorId },
-			{
-				$inc: { "account_info.total_posts": incrementVal },
-				$push: { blogs: blog._id },
-			}
-		);
-		return res.status(200).json({ blogs: blog._id });
-	} catch (error) {
-		return res.status(500).json({ error: error.message });
+		try {
+			// Save blog post to DB
+			await blog.save();
+			const incrementVal = draft ? 0 : 1;
+
+			// Update user
+			await User.findOneAndUpdate(
+				{ _id: authorId },
+				{
+					$inc: { "account_info.total_posts": incrementVal },
+					$push: { blogs: blog._id },
+				}
+			);
+			return res.status(200).json({ blogs: blog._id });
+		} catch (error) {
+			return res.status(500).json({ error: error.message });
+		}
 	}
 };
 
@@ -198,9 +219,9 @@ export const getProfile = async (req, res) => {
 };
 
 export const getBlogs = async (req, res) => {
-	const { blog_id } = req.body;
+	const { blog_id, draft, mode } = req.body;
 
-	const incrementVal = 1;
+	const incrementVal = mode !== "edit" ? 1 : 0;
 
 	try {
 		const blog = await Blog.findOneAndUpdate(
@@ -219,6 +240,10 @@ export const getBlogs = async (req, res) => {
 			{ "personal_info.username": blog.author.personal_info.username },
 			{ $inc: { "account_info.total_reads": incrementVal } }
 		);
+
+		if (blog.draft && !draft) {
+			return res.status(500).json({ error: "You cannot access draft blogs" });
+		}
 
 		return res.status(200).json({ blog });
 	} catch (error) {

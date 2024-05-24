@@ -4,12 +4,14 @@ import { Toaster, toast } from "react-hot-toast";
 import Tag from "./Tag";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useEditor from "../hooks/useEditor";
 
 const PublishForm = () => {
 	const characterLimit = 200;
 	const tagLimit = 10;
+
+	const { blog_id } = useParams();
 
 	let {
 		blog,
@@ -111,7 +113,7 @@ const PublishForm = () => {
 		try {
 			await axios.post(
 				`${import.meta.env.VITE_SERVER_DOMAIN}/post/createBlog`,
-				blogObj,
+				{ ...blogObj, id: blog_id },
 				{
 					headers: {
 						Authorization: `Bearer ${access_token}`,

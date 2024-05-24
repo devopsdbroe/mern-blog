@@ -18,6 +18,7 @@ export const EditorProvider = ({ children }) => {
 	const [editorState, setEditorState] = useState("editor");
 	const [blog, setBlog] = useState(blogStructure);
 	const [textEditor, setTextEditor] = useState({ isReady: false });
+	const [loading, setLoading] = useState(true);
 
 	return (
 		<EditorContext.Provider
@@ -28,6 +29,8 @@ export const EditorProvider = ({ children }) => {
 				setEditorState,
 				textEditor,
 				setTextEditor,
+				loading,
+				setLoading,
 			}}
 		>
 			{children}
