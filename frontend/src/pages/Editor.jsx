@@ -29,25 +29,36 @@ const EditorContent = ({ blog_id, access_token }) => {
 	const { setBlog, loading, setLoading } = useEditor();
 
 	useEffect(() => {
-		if (!blog_id) {
-			setLoading(false);
-		}
+		const fetchBlog = async () => {
+			if (!blog_id) {
+				setLoading(false);
+				return;
+			}
 
-		axios
-			.post(`${import.meta.env.VITE_SERVER_DOMAIN}/post/getBlogs`, {
-				blog_id,
-				draft: true,
-				mode: "edit",
-			})
-			.then(({ data: { blog } }) => {
+			setLoading(true);
+
+			try {
+				const {
+					data: { blog },
+				} = await axios.post(
+					`${import.meta.env.VITE_SERVER_DOMAIN}/post/getBlogs`,
+					{
+						blog_id,
+						draft: true,
+						mode: "edit",
+					}
+				);
+
 				setBlog(blog);
-				setLoading(false);
-			})
-			.catch((error) => {
+			} catch (error) {
 				setBlog(null);
-				setLoading(false);
 				console.log(error);
-			});
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchBlog();
 	}, []);
 
 	if (access_token === null) {
