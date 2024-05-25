@@ -46,7 +46,7 @@ const BlogEditor = () => {
 				})
 				.catch((e) => console.error("Error while destroying editor", e));
 		};
-	}, []);
+	}, [content, tools]);
 
 	const handleBannerUpload = async (e) => {
 		const img = e.target.files[0];

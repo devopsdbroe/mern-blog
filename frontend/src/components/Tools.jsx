@@ -1,7 +1,8 @@
 // Importing tools
 
 import Embed from "@editorjs/embed";
-import List from "@editorjs/list";
+// import List from "@editorjs/list";
+import NestedList from "@editorjs/nested-list";
 import Image from "@editorjs/image";
 import Header from "@editorjs/header";
 import Quote from "@editorjs/quote";
@@ -38,8 +39,11 @@ const uploadImageByUrl = async (e) => {
 export const tools = {
 	embed: Embed,
 	list: {
-		class: List,
+		class: NestedList,
 		inlineToolbar: true,
+		config: {
+			defaultStyle: "unordered",
+		},
 	},
 	image: {
 		class: Image,

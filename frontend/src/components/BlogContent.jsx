@@ -5,7 +5,7 @@ const Img = ({ url, caption }) => {
 				src={url}
 				alt="caption"
 			/>
-			{caption.length > 0 && (
+			{caption && caption.length > 0 && (
 				<p className="w-full text-center my-3 md:mb-12 text-base text-dark-grey">
 					{caption}
 				</p>
@@ -18,24 +18,53 @@ const Quote = ({ quote, caption }) => {
 	return (
 		<div className="bg-purple/10 p-3 pl-5 border-l-4 border-purple">
 			<p className="text-xl leading-10 md:text-2xl">{quote}</p>
-			{caption.length > 0 && <p className="w-full text-purple text-base"></p>}
+			{caption && caption.length > 0 && (
+				<p className="w-full text-purple text-base">{caption}</p>
+			)}
 		</div>
 	);
 };
 
 const List = ({ style, items }) => {
-	return (
-		<ol
-			className={`pl-5 ${style === "ordered" ? "list-decimal" : "list-disc"}`}
-		>
-			{items.map((listItem, i) => (
+	const renderListItems = (items, isOrdered) => {
+		return items.map((item, i) => {
+			if (typeof item === "object" && item.items) {
+				return (
+					<li
+						key={i}
+						className="my-4"
+					>
+						<span dangerouslySetInnerHTML={{ __html: item.content }}></span>
+						{isOrdered ? (
+							<ol className="pl-5 list-decimal">
+								{renderListItems(item.items, isOrdered)}
+							</ol>
+						) : (
+							<ul className="pl-5 list-disc">
+								{renderListItems(item.items, isOrdered)}
+							</ul>
+						)}
+					</li>
+				);
+			}
+			return (
 				<li
 					key={i}
 					className="my-4"
-					dangerouslySetInnerHTML={{ __html: listItem }}
+					dangerouslySetInnerHTML={{ __html: item }}
 				></li>
-			))}
-		</ol>
+			);
+		});
+	};
+
+	return (
+		<div>
+			{style === "ordered" ? (
+				<ol className="pl-5 list-decimal">{renderListItems(items, true)}</ol>
+			) : (
+				<ul className="pl-5 list-disc">{renderListItems(items, false)}</ul>
+			)}
+		</div>
 	);
 };
 
@@ -89,5 +118,7 @@ const BlogContent = ({ block }) => {
 			/>
 		);
 	}
+
+	return null; // Return null if block type is not handled
 };
 export default BlogContent;
