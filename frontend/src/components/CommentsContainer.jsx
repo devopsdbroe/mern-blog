@@ -9,8 +9,6 @@ const CommentsContainer = () => {
 		setCommentsWrapper,
 	} = useContext(BlogContext);
 
-	console.log(commentsWrapper);
-
 	return (
 		<div
 			className={`max-sm:w-full fixed ${

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+	addComment,
 	createBlog,
 	getAllLatestBlogsCount,
 	getBlogs,
@@ -30,5 +31,6 @@ router.post("/getProfile", getProfile);
 router.post("/getBlogs", getBlogs);
 router.post("/likeBlog", validateJWT, likeBlog);
 router.post("/isLikedByUser", validateJWT, isLikedByUser);
+router.post("/addComment", validateJWT, addComment);
 
 export default router;

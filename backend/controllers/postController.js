@@ -1,7 +1,9 @@
 import User from "../models/user.js";
 import Blog from "../models/blog.js";
 import Notification from "../models/notification.js";
+import Comment from "../models/comment.js";
 import { generateBlogId } from "../utils/postHelpers.js";
+import notification from "../models/notification.js";
 
 export const createBlog = async (req, res) => {
 	// req.user was set to user.id in validateJWT
@@ -321,6 +323,70 @@ export const isLikedByUser = async (req, res) => {
 
 		return res.status(200).json({ result });
 	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const addComment = async (req, res) => {
+	const user_id = req.user;
+
+	const { _id, comment, blog_author } = req.body;
+
+	if (!comment || !comment.length) {
+		return res
+			.status(400)
+			.json({ error: "Write something to leave a comment" });
+	}
+
+	try {
+		// Create comment doc
+		const commentObj = new Comment({
+			blog_id: _id,
+			blog_author,
+			comment,
+			commented_by: user_id,
+		});
+
+		const commentFile = await commentObj.save();
+
+		const { comment: saved_comment, commentedAt, children } = commentFile;
+
+		const blog = await Blog.findOneAndUpdate(
+			{ _id },
+			{
+				$push: { comments: commentFile._id },
+				$inc: { "activity.total_comments": 1 },
+				"activity.total_parent_comments": 1,
+			}
+		);
+
+		if (!blog) {
+			return res.status(404).json({ error: "Blog not found" });
+		}
+
+		console.log("Comment created successfully!");
+
+		const notificationObj = {
+			type: "comment",
+			blog: _id,
+			notification_for: blog_author,
+			user: user_id,
+			comment: commentFile._id,
+		};
+
+		await new Notification(notificationObj).save();
+
+		console.log("New notification created successfully!");
+
+		return res.status(200).json({
+			comment: saved_comment,
+			commentedAt,
+			_id: commentFile._id,
+			user_id,
+			children,
+		});
+	} catch (error) {
+		console.log(error);
 		return res.status(500).json({ error: error.message });
 	}
 };
