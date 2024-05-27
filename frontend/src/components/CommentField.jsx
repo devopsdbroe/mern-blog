@@ -10,10 +10,10 @@ const CommentField = ({ action }) => {
 		blog: {
 			_id,
 			author: { _id: blog_author },
+			comments,
+			activity,
+			activity: { total_comments, total_parent_comments },
 		},
-		comments,
-		activity,
-		activity: { total_comments, total_parent_comments },
 		setBlog,
 		setTotalParentCommentsLoaded,
 	} = useContext(BlogContext);
@@ -21,6 +21,7 @@ const CommentField = ({ action }) => {
 	const {
 		userAuth: { access_token, username, fullname, profile_image },
 	} = useContext(UserContext);
+
 	const [comment, setComment] = useState("");
 
 	const handleComment = async () => {
@@ -68,7 +69,7 @@ const CommentField = ({ action }) => {
 			// Update the blog state after creating the comment
 			setBlog({
 				...blog,
-				comment: { ...comments, results: newCommentArr },
+				comments: { ...comments, results: newCommentArr },
 				activity: {
 					...activity,
 					total_comments: total_comments + 1,
@@ -94,7 +95,10 @@ const CommentField = ({ action }) => {
 				placeholder="Leave a comment..."
 				className="input-box pl-5 placeholder:text-dark-grey resize-none h-[150px] overflow-auto"
 			></textarea>
-			<button className="btn-dark mt-5 px-10" onClick={handleComment}>
+			<button
+				className="btn-dark mt-5 px-10"
+				onClick={handleComment}
+			>
 				{action}
 			</button>
 		</>
