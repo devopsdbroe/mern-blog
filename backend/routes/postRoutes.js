@@ -3,6 +3,7 @@ import {
 	addComment,
 	createBlog,
 	getAllLatestBlogsCount,
+	getBlogComments,
 	getBlogs,
 	getLatestBlogs,
 	getProfile,
@@ -32,5 +33,6 @@ router.post("/getBlogs", getBlogs);
 router.post("/likeBlog", validateJWT, likeBlog);
 router.post("/isLikedByUser", validateJWT, isLikedByUser);
 router.post("/addComment", validateJWT, addComment);
+router.post("/getBlogComments", getBlogComments);
 
 export default router;

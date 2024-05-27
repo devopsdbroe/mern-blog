@@ -7,7 +7,9 @@ import BlogInteraction from "../components/BlogInteraction";
 import { getDay } from "../utils/date";
 import BlogCard from "../components/BlogCard";
 import BlogContent from "../components/BlogContent";
-import CommentsContainer from "../components/CommentsContainer";
+import CommentsContainer, {
+	fetchComments,
+} from "../components/CommentsContainer";
 
 export const blogStructure = {
 	title: "",
@@ -50,6 +52,11 @@ const BlogPage = () => {
 			);
 
 			const blog = blogResponse.data.blog;
+
+			blog.comments = await fetchComments({
+				blog_id: blog._id,
+				setParentCommentCountFun: setTotalParentCommentsLoaded,
+			});
 
 			setBlog(blog);
 
@@ -108,7 +115,11 @@ const BlogPage = () => {
 					<CommentsContainer />
 
 					<div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-						<img src={banner} alt="Banner image" className="aspect-video" />
+						<img
+							src={banner}
+							alt="Banner image"
+							className="aspect-video"
+						/>
 
 						<div className="mt-12">
 							<h2>{title}</h2>
@@ -124,7 +135,10 @@ const BlogPage = () => {
 									<p className="capitalize">
 										{fullname}
 										<br />@
-										<Link to={`/user/${author_username}`} className="underline">
+										<Link
+											to={`/user/${author_username}`}
+											className="underline"
+										>
 											{author_username}
 										</Link>
 									</p>
@@ -140,7 +154,10 @@ const BlogPage = () => {
 
 						<div className="my-12 font-gelasio blog-page-content">
 							{content[0].blocks.map((block, i) => (
-								<div key={i} className="my-4 md:my-8">
+								<div
+									key={i}
+									className="my-4 md:my-8"
+								>
 									<BlogContent block={block} />
 								</div>
 							))}
@@ -164,7 +181,10 @@ const BlogPage = () => {
 											key={i}
 											transition={{ duration: 1, delay: i * 0.08 }}
 										>
-											<BlogCard content={blog} author={personal_info} />
+											<BlogCard
+												content={blog}
+												author={personal_info}
+											/>
 										</AnimationWrapper>
 									);
 								})}

@@ -357,7 +357,8 @@ export const addComment = async (req, res) => {
 				$push: { comments: commentFile._id },
 				$inc: { "activity.total_comments": 1 },
 				"activity.total_parent_comments": 1,
-			}
+			},
+			{ new: true }
 		);
 
 		if (!blog) {
@@ -385,6 +386,30 @@ export const addComment = async (req, res) => {
 			user_id,
 			children,
 		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const getBlogComments = async (req, res) => {
+	const { blog_id, skip } = req.body;
+
+	const maxLimit = 5;
+
+	try {
+		const comment = await Comment.find({ blog_id, isReply: false })
+			.populate(
+				"commented_by",
+				"personal_info.username personal_info.fullname personal_info.profile_img"
+			)
+			.skip(skip)
+			.limit(maxLimit)
+			.sort({
+				commentedAt: -1,
+			});
+
+		return res.status(200).json(comment);
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ error: error.message });

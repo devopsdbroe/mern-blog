@@ -31,7 +31,7 @@ const CommentField = ({ action }) => {
 		}
 
 		// Validate that there is a value provided
-		if (!comment.length) {
+		if (!comment || !comment.length) {
 			return toast.error("Write something to leave a comment");
 		}
 
