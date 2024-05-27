@@ -330,7 +330,7 @@ export const isLikedByUser = async (req, res) => {
 export const addComment = async (req, res) => {
 	const user_id = req.user;
 
-	const { _id, comment, blog_author } = req.body;
+	const { _id, comment, blog_author, replying_to } = req.body;
 
 	if (!comment || !comment.length) {
 		return res
@@ -340,14 +340,20 @@ export const addComment = async (req, res) => {
 
 	try {
 		// Create comment doc
-		const commentObj = new Comment({
+		const commentObj = {
 			blog_id: _id,
 			blog_author,
 			comment,
 			commented_by: user_id,
-		});
+		};
 
-		const commentFile = await commentObj.save();
+		// Check if the comment is a reply to another comment
+		// Set the parent comment of the reply
+		if (replying_to) {
+			commentObj.parent = replying_to;
+		}
+
+		const commentFile = await new Comment(commentObj).save();
 
 		const { comment: saved_comment, commentedAt, children } = commentFile;
 
@@ -357,7 +363,7 @@ export const addComment = async (req, res) => {
 				$push: { comments: commentFile._id },
 				$inc: {
 					"activity.total_comments": 1,
-					"activity.total_parent_comments": 1,
+					"activity.total_parent_comments": replying_to ? 0 : 1,
 				},
 			},
 			{ new: true }
@@ -370,12 +376,23 @@ export const addComment = async (req, res) => {
 		console.log("Comment created successfully!");
 
 		const notificationObj = {
-			type: "comment",
+			type: replying_to ? "reply" : "comment",
 			blog: _id,
 			notification_for: blog_author,
 			user: user_id,
 			comment: commentFile._id,
 		};
+
+		if (replying_to) {
+			notificationObj.replied_on_comment = replying_to;
+
+			const replyingToCommentDoc = await Comment.findOneAndUpdate(
+				{ _id: replying_to },
+				{ $push: { children: commentFile._id } }
+			);
+
+			notificationObj.notification_for = replyingToCommentDoc.commented_by;
+		}
 
 		await new Notification(notificationObj).save();
 
