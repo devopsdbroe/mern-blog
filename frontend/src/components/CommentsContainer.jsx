@@ -101,7 +101,7 @@ const CommentsContainer = () => {
 								<CommentCard
 									index={i}
 									leftVal={comment.childrenLevel * 4}
-									commentsData={comment}
+									commentData={comment}
 								/>
 							</AnimationWrapper>
 						);

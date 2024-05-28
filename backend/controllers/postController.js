@@ -351,6 +351,7 @@ export const addComment = async (req, res) => {
 		// Set the parent comment of the reply
 		if (replying_to) {
 			commentObj.parent = replying_to;
+			commentObj.isReply = true;
 		}
 
 		const commentFile = await new Comment(commentObj).save();
@@ -431,6 +432,35 @@ export const getBlogComments = async (req, res) => {
 		return res.status(200).json(comment);
 	} catch (error) {
 		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const getReplies = async (req, res) => {
+	const { _id, skip } = req.body;
+
+	const max_limit = 5;
+
+	try {
+		const doc = await Comment.findOne({ _id })
+			.populate({
+				path: "children",
+				option: {
+					limit: max_limit,
+					skip,
+					sort: { commentedAt: -1 },
+				},
+				populate: {
+					path: "commented_by",
+					select:
+						"personal_info.profile_img personal_info.fullname personal_info.username",
+				},
+				select: "-blog_id -updatedAt",
+			})
+			.select("children");
+
+		return res.status(200).json({ replies: doc.children });
+	} catch (error) {
 		return res.status(500).json({ error: error.message });
 	}
 };

@@ -25,7 +25,7 @@ const CommentField = ({
 	} = useContext(BlogContext);
 
 	const {
-		userAuth: { access_token, username, fullname, profile_image },
+		userAuth: { access_token, username, fullname, profile_img },
 	} = useContext(UserContext);
 
 	const [comment, setComment] = useState("");
@@ -61,7 +61,7 @@ const CommentField = ({
 			setComment("");
 
 			data.commented_by = {
-				personal_info: { username, fullname, profile_image },
+				personal_info: { username, fullname, profile_img },
 			};
 
 			let newCommentArr;
