@@ -37,7 +37,7 @@ const Navbar = () => {
 
 	return (
 		<>
-			<nav className="navbar">
+			<nav className="navbar z-50">
 				{/* Logo */}
 				<Link
 					to="/"
