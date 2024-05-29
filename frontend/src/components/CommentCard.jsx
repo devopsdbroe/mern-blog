@@ -11,22 +11,6 @@ import axios from "axios";
 const CommentCard = ({ index, leftVal, commentData }) => {
 	const [isReplying, setIsReplying] = useState(false);
 
-	const getParentIndex = () => {
-		let startingPoint = index - 1;
-
-		try {
-			while (
-				commentsArr[startingPoint].childrenLevel >= commentData.childrenLevel
-			) {
-				startingPoint--;
-			}
-		} catch (error) {
-			startingPoint = undefined;
-		}
-
-		return startingPoint;
-	};
-
 	const {
 		commented_by: {
 			personal_info: { profile_img, fullname, username: commented_by_username },
@@ -55,6 +39,22 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 	const {
 		userAuth: { access_token, username },
 	} = useContext(UserContext);
+
+	const getParentIndex = () => {
+		let startingPoint = index - 1;
+
+		try {
+			while (
+				commentsArr[startingPoint].childrenLevel >= commentData.childrenLevel
+			) {
+				startingPoint--;
+			}
+		} catch (error) {
+			startingPoint = undefined;
+		}
+
+		return startingPoint;
+	};
 
 	const removeCommentCards = (startingPoint, isDelete = false) => {
 		if (commentsArr[startingPoint]) {
@@ -102,8 +102,8 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 		});
 	};
 
-	const loadReplies = async ({ skip = 0 }) => {
-		if (children.length) {
+	const loadReplies = async ({ skip = 0, currentIndex = index }) => {
+		if (commentsArr[currentIndex].children.length) {
 			hideReplies();
 
 			try {
@@ -112,17 +112,18 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 				} = await axios.post(
 					`${import.meta.env.VITE_SERVER_DOMAIN}/post/getReplies`,
 					{
-						_id,
+						_id: commentsArr[currentIndex]._id,
 						skip,
 					}
 				);
 
-				commentData.isReplyLoaded = true;
+				commentsArr[currentIndex].isReplyLoaded = true;
 
 				for (let i = 0; i < replies.length; i++) {
-					replies[i].childrenLevel = commentData.childrenLevel + 1;
+					replies[i].childrenLevel =
+						commentsArr[currentIndex].childrenLevel + 1;
 
-					commentsArr.splice(index + 1 + i + skip, 0, replies[i]);
+					commentsArr.splice(currentIndex + 1 + i + skip, 0, replies[i]);
 				}
 
 				setBlog({ ...blog, comments: { ...comments, results: commentsArr } });
@@ -149,7 +150,7 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 				}
 			);
 
-			e.target.removeAttribute("disable");
+			e.target.removeAttribute("disabled");
 			removeCommentCards(index + 1, true);
 		} catch (error) {
 			console.log("Error deleting this comment");
@@ -169,6 +170,40 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 		}
 
 		setIsReplying((preVal) => !preVal);
+	};
+
+	const LoadMoreRepliesButton = () => {
+		const parentIndex = getParentIndex();
+
+		const button = (
+			<button
+				onClick={() =>
+					loadReplies({
+						skip: index - parentIndex,
+						currentIndex: parentIndex,
+					})
+				}
+				className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"
+			>
+				Load More Replies
+			</button>
+		);
+
+		// Only show "Load More Replies" button below the last child
+		if (commentsArr[index + 1]) {
+			if (
+				commentsArr[index + 1].childrenLevel < commentsArr[index].childrenLevel
+			) {
+				// Don't show "Load More Replies" button if there are no more child comments under the parent
+				if (index - parentIndex < commentsArr[parentIndex].children.length) {
+					return button;
+				}
+			}
+		} else {
+			if (parentIndex) {
+				return button;
+			}
+		}
 	};
 
 	return (
@@ -239,6 +274,8 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 					</div>
 				)}
 			</div>
+
+			<LoadMoreRepliesButton />
 		</div>
 	);
 };

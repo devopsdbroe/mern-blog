@@ -444,7 +444,7 @@ export const getReplies = async (req, res) => {
 		const doc = await Comment.findOne({ _id })
 			.populate({
 				path: "children",
-				option: {
+				options: {
 					limit: max_limit,
 					skip,
 					sort: { commentedAt: -1 },
