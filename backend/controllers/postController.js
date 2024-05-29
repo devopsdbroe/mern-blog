@@ -2,8 +2,7 @@ import User from "../models/user.js";
 import Blog from "../models/blog.js";
 import Notification from "../models/notification.js";
 import Comment from "../models/comment.js";
-import { generateBlogId } from "../utils/postHelpers.js";
-import notification from "../models/notification.js";
+import { deleteComments, generateBlogId } from "../utils/postHelpers.js";
 
 export const createBlog = async (req, res) => {
 	// req.user was set to user.id in validateJWT
@@ -460,6 +459,32 @@ export const getReplies = async (req, res) => {
 			.select("children");
 
 		return res.status(200).json({ replies: doc.children });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+export const deleteComment = async (req, res) => {
+	const user_id = req.user;
+
+	const { _id } = req.body;
+
+	try {
+		const comment = await Comment.findOne({ _id });
+
+		// Validate if user is allowed to delete comment
+		if (
+			user_id === comment.commented_by.toString() ||
+			user_id === comment.blog_author.toString()
+		) {
+			deleteComments(_id);
+
+			return res.status(200).json({ status: "Comment successfully deleted" });
+		} else {
+			return res
+				.status(403)
+				.json({ error: "You are not allowed to delete this comment" });
+		}
 	} catch (error) {
 		return res.status(500).json({ error: error.message });
 	}

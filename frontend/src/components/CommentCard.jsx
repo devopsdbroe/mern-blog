@@ -11,9 +11,25 @@ import axios from "axios";
 const CommentCard = ({ index, leftVal, commentData }) => {
 	const [isReplying, setIsReplying] = useState(false);
 
+	const getParentIndex = () => {
+		let startingPoint = index - 1;
+
+		try {
+			while (
+				commentsArr[startingPoint].childrenLevel >= commentData.childrenLevel
+			) {
+				startingPoint--;
+			}
+		} catch (error) {
+			startingPoint = undefined;
+		}
+
+		return startingPoint;
+	};
+
 	const {
 		commented_by: {
-			personal_info: { profile_img, fullname, username },
+			personal_info: { profile_img, fullname, username: commented_by_username },
 		},
 		commentedAt,
 		comment,
@@ -25,16 +41,22 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 		blog,
 		blog: {
 			comments,
+			activity,
+			activity: { total_parent_comments },
 			comments: { results: commentsArr },
+			author: {
+				personal_info: { username: blog_author },
+			},
 		},
 		setBlog,
+		setTotalParentCommentsLoaded,
 	} = useContext(BlogContext);
 
 	const {
-		userAuth: { access_token },
+		userAuth: { access_token, username },
 	} = useContext(UserContext);
 
-	const removeCommentCards = (startingPoint) => {
+	const removeCommentCards = (startingPoint, isDelete = false) => {
 		if (commentsArr[startingPoint]) {
 			while (
 				commentsArr[startingPoint].childrenLevel > commentData.childrenLevel
@@ -47,7 +69,37 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 			}
 		}
 
-		setBlog({ ...blog, comments: { results: commentsArr } });
+		if (isDelete) {
+			const parentIndex = getParentIndex();
+
+			if (parentIndex !== undefined) {
+				commentsArr[parentIndex].children = commentsArr[
+					parentIndex
+				].children.filter((child) => child !== _id);
+
+				if (!commentsArr[parentIndex].children.length) {
+					commentsArr[parentIndex].isReplyLoaded = false;
+				}
+			}
+
+			commentsArr.splice(index, 1);
+		}
+
+		// Deleting parent comment
+		if (commentData.childrenLevel === 0 && isDelete) {
+			setTotalParentCommentsLoaded((preVal) => preVal - 1);
+		}
+
+		setBlog({
+			...blog,
+			comments: { results: commentsArr },
+			activity: {
+				...activity,
+				total_parent_comments:
+					total_parent_comments -
+					(commentData.childrenLevel === 0 && isDelete ? 1 : 0),
+			},
+		});
 	};
 
 	const loadReplies = async ({ skip = 0 }) => {
@@ -80,6 +132,30 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 		}
 	};
 
+	const deleteComment = async (e) => {
+		e.target.setAttribute("disabled", true);
+
+		try {
+			// Make request to backend to delete comment
+			await axios.post(
+				`${import.meta.env.VITE_SERVER_DOMAIN}/post/deleteComment`,
+				{
+					_id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${access_token}`,
+					},
+				}
+			);
+
+			e.target.removeAttribute("disable");
+			removeCommentCards(index + 1, true);
+		} catch (error) {
+			console.log("Error deleting this comment");
+		}
+	};
+
 	const hideReplies = () => {
 		commentData.isReplyLoaded = false;
 
@@ -108,7 +184,7 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 						className="w-6 h-6 rounded-full"
 					/>
 					<p className="line-clamp-1">
-						{fullname} @{username}
+						{fullname} @{commented_by_username}
 					</p>
 					<p className="m-w-fit">{getDay(commentedAt)}</p>
 				</div>
@@ -141,6 +217,15 @@ const CommentCard = ({ index, leftVal, commentData }) => {
 					>
 						Reply
 					</button>
+
+					{(username === commented_by_username || username === blog_author) && (
+						<button
+							className="p-2 px-3 rounded-md border border-grey ml-auto hover:bg-red/30 hover:text-red flex items-center"
+							onClick={deleteComment}
+						>
+							<i className="fi fi-rr-trash pointer-events-none"></i>
+						</button>
+					)}
 				</div>
 
 				{isReplying && (
