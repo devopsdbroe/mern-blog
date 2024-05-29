@@ -8,6 +8,7 @@ import SearchPage from "./pages/SearchPage";
 import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/ProfilePage";
 import BlogPage from "./pages/BlogPage";
+import SideNav from "./components/SideNav";
 
 function App() {
 	return (
@@ -29,6 +30,19 @@ function App() {
 						index
 						element={<Home />}
 					/>
+					<Route
+						path="settings"
+						element={<SideNav />}
+					>
+						<Route
+							path="edit-profile"
+							element={<h1>This is edit profile page</h1>}
+						/>
+						<Route
+							path="change-password"
+							element={<h1>This is change password page</h1>}
+						/>
+					</Route>
 					<Route
 						path="signin"
 						element={<UserAuth type="sign-in" />}
