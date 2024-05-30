@@ -9,6 +9,7 @@ import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/ProfilePage";
 import BlogPage from "./pages/BlogPage";
 import SideNav from "./components/SideNav";
+import ChangePassword from "./pages/ChangePassword";
 
 function App() {
 	return (
@@ -40,7 +41,7 @@ function App() {
 						/>
 						<Route
 							path="change-password"
-							element={<h1>This is change password page</h1>}
+							element={<ChangePassword />}
 						/>
 					</Route>
 					<Route
