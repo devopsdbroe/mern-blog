@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { formatDataToSend, generateUsername } from "../utils/authHelpers.js";
 
 import { auth } from "../config/firebase.js";
+import { passwordRegex } from "../utils/regex.js";
 
 export const signup = async (req, res) => {
 	try {
@@ -116,5 +117,59 @@ export const google = async (req, res) => {
 			error:
 				"Failed to authenticate to Google. Please try with another Google account.",
 		});
+	}
+};
+
+export const changePassword = async (req, res) => {
+	const { currentPassword, newPassword } = req.body;
+
+	if (
+		!passwordRegex.test(currentPassword) ||
+		!passwordRegex.test(newPassword)
+	) {
+		return res.status(403).json({
+			error:
+				"Password should be 6-20 characters long with at least 1 capital letter and 1 number",
+		});
+	}
+
+	try {
+		const user = await User.findOne({ _id: req.user });
+
+		// Check if user has signed up using Google
+		if (user.google_auth) {
+			return res.status(403).json({
+				error:
+					"You cannot change your password because this account was created using a Google account",
+			});
+		}
+
+		// Compare plaintext password that was submitted against the hashed PW from MongoDB
+		const result = await bcrypt.compare(
+			currentPassword,
+			user.personal_info.password
+		);
+
+		if (!result) {
+			return res.status(403).json({ error: "Current password is incorrect" });
+		}
+
+		// If passwords pass validation, hash the new PW and add it to MongoDB
+		const hashed_password = await bcrypt.hash(newPassword, 10);
+
+		await User.findOneAndUpdate(
+			{ _id: req.user },
+			{ "personal_info.password": hashed_password }
+		);
+
+		return res.status(200).json({ status: "Password changed successfully" });
+	} catch (error) {
+		console.log(error);
+		res
+			.status(500)
+			.json({
+				error:
+					"Something went wrong while changing the password. Please try again later.",
+			});
 	}
 };
