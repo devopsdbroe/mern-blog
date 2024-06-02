@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import BlogPage from "./pages/BlogPage";
 import SideNav from "./components/SideNav";
 import ChangePassword from "./pages/ChangePassword";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
 	return (
@@ -37,7 +38,7 @@ function App() {
 					>
 						<Route
 							path="edit-profile"
-							element={<h1>This is edit profile page</h1>}
+							element={<EditProfile />}
 						/>
 						<Route
 							path="change-password"
