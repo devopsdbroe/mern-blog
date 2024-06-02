@@ -15,6 +15,8 @@ import {
 	searchBlogs,
 	searchBlogsCount,
 	searchUsers,
+	updateProfile,
+	updateProfileImg,
 } from "../controllers/postController.js";
 import {
 	validateBlogData,
@@ -38,5 +40,7 @@ router.post("/addComment", validateJWT, addComment);
 router.post("/getBlogComments", getBlogComments);
 router.post("/getReplies", getReplies);
 router.post("/deleteComment", validateJWT, deleteComment);
+router.post("/updateProfileImg", validateJWT, updateProfileImg);
+router.post("/updateProfile", validateJWT, updateProfile);
 
 export default router;
